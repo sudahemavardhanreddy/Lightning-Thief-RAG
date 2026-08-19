@@ -16,7 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
-PDF_PATH = BASE_DIR / "The_Lightning_Thief.pdf"
+PDF_PATH = BASE_DIR / "Lightning_Thief_KT(1).pdf"
 INDEX_DIR = BASE_DIR / "faiss_index"
 
 app = FastAPI(title="The Lightning Thief RAG", version="1.0.0")
@@ -28,7 +28,7 @@ if not os.getenv("GOOGLE_API_KEY"):
 # RAG configuration
 # ---------------------------
 EMBEDDING_MODEL = "models/gemini-embedding-001"
-LLM_MODEL = "gemini-2.5-flash"
+LLM_MODEL = "gemini-3.6-flash"
 
 embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)
 llm = ChatGoogleGenerativeAI(
@@ -43,7 +43,7 @@ def build_vector_store():
     """Load the book, split it into chunks, create embeddings and build FAISS."""
     if not PDF_PATH.exists():
         raise FileNotFoundError(
-            f"Book PDF not found at {PDF_PATH}. Put The_Lightning_Thief.pdf beside app.py."
+            f"Knowledge PDF not found at {PDF_PATH}. Put Lightning_Thief_KT(1).pdf beside app.py."
         )
 
     loader = PyPDFLoader(str(PDF_PATH))
