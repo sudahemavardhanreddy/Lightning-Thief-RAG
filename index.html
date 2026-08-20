@@ -1,388 +1,937 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lightning Thief • RAG Assistant</title>
-  <style>
-    :root {
-      --bg: #07111f;
-      --panel: rgba(15, 28, 47, 0.78);
-      --panel-2: rgba(20, 38, 63, 0.72);
-      --text: #edf6ff;
-      --muted: #9db1c8;
-      --accent: #62d7ff;
-      --accent-2: #9b7cff;
-      --border: rgba(255,255,255,.10);
-      --user: rgba(98, 215, 255, .14);
-      --bot: rgba(155, 124, 255, .13);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * { box-sizing: border-box; }
+    <title>Lightning Thief RAG</title>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 15% 10%, rgba(98,215,255,.13), transparent 28%),
-        radial-gradient(circle at 85% 20%, rgba(155,124,255,.14), transparent 28%),
-        linear-gradient(145deg, #040914, #0a1627 55%, #07111f);
-      display: flex;
-      justify-content: center;
-      padding: 28px;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .app {
-      width: min(1100px, 100%);
-      min-height: calc(100vh - 56px);
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 18px;
-    }
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(218, 165, 72, 0.08), transparent 28%),
+                radial-gradient(circle at 85% 80%, rgba(45, 108, 150, 0.12), transparent 30%),
+                #080d16;
+            color: #f4f1e8;
+            min-height: 100vh;
+        }
 
-    .sidebar, .chat {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      backdrop-filter: blur(18px);
-      box-shadow: 0 20px 70px rgba(0,0,0,.28);
-    }
+        /* =========================
+           APP LAYOUT
+        ========================== */
 
-    .sidebar {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
+        .app {
+            width: min(1100px, 94%);
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      font-size: 25px;
-      background: linear-gradient(135deg, rgba(98,215,255,.2), rgba(155,124,255,.22));
-      border: 1px solid var(--border);
-    }
+        /* =========================
+           HEADER
+        ========================== */
 
-    h1 {
-      font-size: 21px;
-      margin: 0;
-      line-height: 1.2;
-    }
+        header {
+            padding: 28px 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-      margin-top: 6px;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
 
-    .badge {
-      display: inline-flex;
-      width: fit-content;
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      color: var(--accent);
-      border: 1px solid rgba(98,215,255,.25);
-      background: rgba(98,215,255,.07);
-    }
+        .logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(
+                145deg,
+                #d9a441,
+                #8e6120
+            );
+            box-shadow:
+                0 10px 30px rgba(217,164,65,0.18);
+            font-size: 25px;
+        }
 
-    .info {
-      padding: 15px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      border-radius: 16px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+        .brand h1 {
+            font-size: 21px;
+            letter-spacing: -0.4px;
+        }
 
-    .info strong { color: var(--text); }
+        .brand p {
+            margin-top: 4px;
+            color: #8792a3;
+            font-size: 13px;
+        }
 
-    .examples {
-      margin-top: auto;
-    }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #86d8a7;
+            font-size: 13px;
+            background: rgba(134,216,167,0.06);
+            border: 1px solid rgba(134,216,167,0.15);
+            padding: 9px 13px;
+            border-radius: 999px;
+        }
 
-    .example {
-      width: 100%;
-      text-align: left;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: rgba(255,255,255,.025);
-      border-radius: 12px;
-      padding: 10px;
-      margin-top: 8px;
-      cursor: pointer;
-      transition: .2s ease;
-    }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #64e59a;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #64e59a;
+        }
 
-    .example:hover {
-      color: var(--text);
-      border-color: rgba(98,215,255,.35);
-      transform: translateY(-1px);
-    }
+        /* =========================
+           HERO
+        ========================== */
 
-    .chat {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      overflow: hidden;
-    }
+        .hero {
+            padding: 38px 0 28px;
+        }
 
-    .header {
-      padding: 19px 22px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
+        .hero-label {
+            color: #d9a441;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
 
-    .status {
-      font-size: 12px;
-      color: #8ef0bb;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
+        .hero h2 {
+            font-size: clamp(28px, 5vw, 43px);
+            line-height: 1.08;
+            max-width: 700px;
+            letter-spacing: -1.5px;
+        }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #57e39c;
-      box-shadow: 0 0 12px rgba(87,227,156,.8);
-    }
+        .hero h2 span {
+            color: #d9a441;
+        }
 
-    .messages {
-      padding: 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        .hero p {
+            color: #8d98a9;
+            margin-top: 13px;
+            max-width: 650px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
 
-    .msg {
-      max-width: 84%;
-      padding: 14px 16px;
-      border-radius: 18px;
-      line-height: 1.55;
-      font-size: 14px;
-      white-space: pre-wrap;
-      border: 1px solid var(--border);
-    }
+        /* =========================
+           QUICK QUESTIONS
+        ========================== */
 
-    .msg.user {
-      align-self: flex-end;
-      background: var(--user);
-      border-bottom-right-radius: 5px;
-    }
+        .quick-title {
+            color: #737f91;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
 
-    .msg.bot {
-      align-self: flex-start;
-      background: var(--bot);
-      border-bottom-left-radius: 5px;
-    }
+        .quick {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
 
-    .sources {
-      margin-top: 10px;
-      display: grid;
-      gap: 7px;
-    }
+        .quick button {
+            border: 1px solid rgba(217,164,65,0.16);
+            background: rgba(255,255,255,0.035);
+            color: #b9c2cf;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
 
-    .source {
-      font-size: 11px;
-      color: var(--muted);
-      border-left: 2px solid var(--accent);
-      padding-left: 8px;
-    }
+        .quick button:hover {
+            border-color: rgba(217,164,65,0.45);
+            color: #f2d28e;
+            background: rgba(217,164,65,0.06);
+        }
 
-    .composer {
-      padding: 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      background: rgba(0,0,0,.10);
-    }
+        /* =========================
+           CHAT
+        ========================== */
 
-    textarea {
-      flex: 1;
-      resize: none;
-      min-height: 50px;
-      max-height: 130px;
-      border-radius: 15px;
-      border: 1px solid var(--border);
-      outline: none;
-      padding: 14px;
-      color: var(--text);
-      background: rgba(255,255,255,.045);
-      font: inherit;
-    }
+        .chat {
+            flex: 1;
+            padding-bottom: 145px;
+        }
 
-    textarea:focus {
-      border-color: rgba(98,215,255,.45);
-    }
+        .message {
+            display: flex;
+            margin-bottom: 22px;
+            animation: appear 0.25s ease;
+        }
 
-    button.send {
-      width: 105px;
-      border: 0;
-      border-radius: 15px;
-      color: #03111c;
-      font-weight: 800;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--accent), #a9edff);
-    }
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
 
-    button.send:disabled {
-      opacity: .5;
-      cursor: wait;
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    @media (max-width: 800px) {
-      body { padding: 12px; }
-      .app {
-        grid-template-columns: 1fr;
-        min-height: calc(100vh - 24px);
-      }
-      .sidebar { display: none; }
-      .chat { min-height: calc(100vh - 24px); }
-      .msg { max-width: 92%; }
-    }
-  </style>
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 760px;
+            line-height: 1.65;
+            font-size: 14px;
+        }
+
+        .user .bubble {
+            background: #17283a;
+            border: 1px solid rgba(95,150,190,0.2);
+            padding: 13px 17px;
+            border-radius: 18px 18px 5px 18px;
+            color: #e7edf4;
+        }
+
+        .assistant .bubble {
+            background: rgba(255,255,255,0.035);
+            border-left: 3px solid #d9a441;
+            padding: 16px 19px;
+            border-radius: 5px 16px 16px 5px;
+            color: #e7e4dc;
+        }
+
+        .assistant-label {
+            color: #d9a441;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            margin-bottom: 7px;
+        }
+
+        .answer {
+            white-space: pre-wrap;
+        }
+
+        /* =========================
+           SOURCES
+        ========================== */
+
+        .sources {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 13px;
+        }
+
+        .source {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 9px;
+            border-radius: 7px;
+            background: rgba(217,164,65,0.06);
+            border: 1px solid rgba(217,164,65,0.12);
+            color: #9ea8b6;
+            font-size: 10px;
+        }
+
+        .source strong {
+            color: #d9a441;
+            font-weight: 500;
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================== */
+
+        .empty {
+            margin-top: 35px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.025);
+            border-radius: 20px;
+            padding: 38px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .empty h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .empty p {
+            color: #7f8998;
+            font-size: 13px;
+        }
+
+        /* =========================
+           INPUT AREA
+        ========================== */
+
+        .input-area {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            width: min(900px, 92%);
+            z-index: 20;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(12,19,30,0.94);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(217,164,65,0.25);
+            border-radius: 17px;
+            box-shadow:
+                0 18px 60px rgba(0,0,0,0.45);
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #f4f1e8;
+            font-family: inherit;
+            font-size: 14px;
+            padding: 11px 13px;
+            min-height: 42px;
+            max-height: 110px;
+        }
+
+        textarea::placeholder {
+            color: #5f6978;
+        }
+
+        .send {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 12px;
+            background: #d9a441;
+            color: #15100a;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .send:hover {
+            transform: translateY(-1px);
+            background: #e7b75c;
+        }
+
+        .send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hint {
+            text-align: center;
+            color: #4e5867;
+            font-size: 10px;
+            margin-top: 7px;
+        }
+
+        /* =========================
+           LOADING
+        ========================== */
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .loading span {
+            width: 6px;
+            height: 6px;
+            background: #d9a441;
+            border-radius: 50%;
+            animation: pulse 0.9s infinite alternate;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 0.25;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(-3px);
+            }
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 650px) {
+
+            .app {
+                width: 92%;
+            }
+
+            header {
+                padding-top: 20px;
+            }
+
+            .status {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 28px;
+            }
+
+            .hero h2 {
+                font-size: 30px;
+            }
+
+            .bubble {
+                max-width: 90%;
+                font-size: 13px;
+            }
+
+            .input-area {
+                bottom: 12px;
+                width: 94%;
+            }
+
+            .hint {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
+
 <body>
-  <main class="app">
-    <aside class="sidebar">
-      <div class="logo">⚡</div>
-      <div>
-        <h1>Lightning Thief RAG</h1>
-        <div class="subtitle">
-          Ask questions about the uploaded book. Answers are generated from retrieved book chunks.
+
+<div class="app">
+
+    <!-- HEADER -->
+    <header>
+
+        <div class="brand">
+
+            <div class="logo">
+                ⚡
+            </div>
+
+            <div>
+                <h1>Lightning Thief Archives</h1>
+                <p>Ask questions. Search the story.</p>
+            </div>
+
         </div>
-      </div>
 
-      <span class="badge">FastAPI • FAISS • Gemini</span>
-
-      <div class="info">
-        <strong>Pipeline</strong><br/>
-        PDF → chunks → embeddings → FAISS → retrieval → LLM → answer
-      </div>
-
-      <div class="info">
-        <strong>Source</strong><br/>
-        The Lightning Thief PDF
-      </div>
-
-      <div class="examples">
-        <div class="subtitle">Try asking</div>
-        <button class="example" onclick="useExample(this)">Who is Percy Jackson?</button>
-        <button class="example" onclick="useExample(this)">Why is the master bolt important?</button>
-        <button class="example" onclick="useExample(this)">Who betrays Percy?</button>
-        <button class="example" onclick="useExample(this)">What happens at the Lotus Casino?</button>
-      </div>
-    </aside>
-
-    <section class="chat">
-      <header class="header">
-        <div>
-          <strong>Book Knowledge Assistant</strong>
-          <div class="subtitle">Grounded answers with retrieved sources</div>
+        <div class="status">
+            <span class="status-dot"></span>
+            RAG Online
         </div>
-        <div class="status"><span class="dot"></span> RAG online</div>
-      </header>
 
-      <div class="messages" id="messages">
-        <div class="msg bot">
-          Hi! I’m your <b>Lightning Thief RAG assistant</b>. Ask me anything about the book and I’ll answer using the retrieved book context.
+    </header>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <div class="hero-label">
+            Camp Half-Blood Knowledge Base
         </div>
-      </div>
 
-      <form class="composer" id="form">
-        <textarea id="question" placeholder="Ask a question about The Lightning Thief..." rows="1"></textarea>
-        <button class="send" id="send" type="submit">Ask ⚡</button>
-      </form>
+        <h2>
+            Explore the world of
+            <span>The Lightning Thief.</span>
+        </h2>
+
+        <p>
+            Ask about characters, quests, monsters, locations,
+            events, or anything contained in the book.
+        </p>
+
     </section>
-  </main>
+
+
+    <!-- QUICK QUESTIONS -->
+    <div class="quick-title">
+        Try a question
+    </div>
+
+    <div class="quick">
+
+        <button onclick="askQuick('Who is Percy Jackson?')">
+            Who is Percy Jackson?
+        </button>
+
+        <button onclick="askQuick('Why is the master bolt important?')">
+            Why is the master bolt important?
+        </button>
+
+        <button onclick="askQuick('Who betrays Percy?')">
+            Who betrays Percy?
+        </button>
+
+        <button onclick="askQuick('What happens at the Lotus Casino?')">
+            What happens at the Lotus Casino?
+        </button>
+
+    </div>
+
+
+    <!-- CHAT -->
+    <main class="chat" id="chat">
+
+        <div class="empty" id="emptyState">
+
+            <div class="empty-icon">
+                🏛️
+            </div>
+
+            <h3>
+                Ask the archives
+            </h3>
+
+            <p>
+                Your answers are generated from
+                retrieved sections of The Lightning Thief.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- INPUT -->
+<div class="input-area">
+
+    <div class="input-box">
+
+        <textarea
+            id="question"
+            placeholder="Ask something about The Lightning Thief..."
+            rows="1"
+        ></textarea>
+
+        <button
+            class="send"
+            id="sendButton"
+            onclick="sendQuestion()"
+        >
+            ↑
+        </button>
+
+    </div>
+
+    <div class="hint">
+        Answers are grounded in the uploaded book
+    </div>
+
+</div>
+
 
 <script>
-  const messages = document.getElementById("messages");
-  const form = document.getElementById("form");
-  const input = document.getElementById("question");
-  const send = document.getElementById("send");
 
-  function addMessage(text, type, sources = []) {
-    const wrap = document.createElement("div");
-    wrap.className = `msg ${type}`;
-    wrap.textContent = text;
+    const questionInput =
+        document.getElementById("question");
 
-    if (sources.length) {
-      const src = document.createElement("div");
-      src.className = "sources";
+    const sendButton =
+        document.getElementById("sendButton");
 
-      sources.forEach(s => {
-        const item = document.createElement("div");
-        item.className = "source";
-        item.textContent = `Book page ${s.page ?? "unknown"} — ${s.text}`;
-        src.appendChild(item);
-      });
+    const chat =
+        document.getElementById("chat");
 
-      wrap.appendChild(src);
+    const emptyState =
+        document.getElementById("emptyState");
+
+
+    // =========================================================
+    // QUICK QUESTION
+    // =========================================================
+
+    function askQuick(question) {
+
+        questionInput.value = question;
+
+        sendQuestion();
     }
 
-    messages.appendChild(wrap);
-    messages.scrollTop = messages.scrollHeight;
-  }
 
-  function useExample(btn) {
-    input.value = btn.textContent;
-    input.focus();
-  }
+    // =========================================================
+    // ADD USER MESSAGE
+    // =========================================================
 
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      form.requestSubmit();
+    function addUserMessage(question) {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message user";
+
+        message.innerHTML = `
+            <div class="bubble">
+                ${escapeHtml(question)}
+            </div>
+        `;
+
+        chat.appendChild(message);
     }
-  });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
 
-    const question = input.value.trim();
-    if (!question) return;
+    // =========================================================
+    // ADD ASSISTANT MESSAGE
+    // =========================================================
 
-    addMessage(question, "user");
-    input.value = "";
-    send.disabled = true;
-    send.textContent = "Thinking…";
+    function addAssistantMessage(
+        answer,
+        sources = []
+    ) {
 
-    try {
-      const response = await fetch("/ask", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({question, k: 4})
-      });
+        const message =
+            document.createElement("div");
 
-      const data = await response.json();
+        message.className =
+            "message assistant";
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Request failed");
-      }
+        let sourceHTML = "";
 
-      addMessage(data.answer, "bot", data.sources || []);
-    } catch (error) {
-      addMessage("Sorry — " + error.message, "bot");
-    } finally {
-      send.disabled = false;
-      send.textContent = "Ask ⚡";
-      input.focus();
+        if (sources.length > 0) {
+
+            sourceHTML = `
+                <div class="sources">
+
+                    ${sources.map(source => `
+                        <div class="source">
+                            <strong>Page ${source.page ?? "?"}</strong>
+                        </div>
+                    `).join("")}
+
+                </div>
+            `;
+        }
+
+        message.innerHTML = `
+            <div class="bubble">
+
+                <div class="assistant-label">
+                    Archive Assistant
+                </div>
+
+                <div class="answer">
+                    ${escapeHtml(answer)}
+                </div>
+
+                ${sourceHTML}
+
+            </div>
+        `;
+
+        chat.appendChild(message);
     }
-  });
+
+
+    // =========================================================
+    // LOADING MESSAGE
+    // =========================================================
+
+    function addLoadingMessage() {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message assistant";
+
+        message.id =
+            "loadingMessage";
+
+        message.innerHTML = `
+            <div class="bubble">
+
+                <div class="assistant-label">
+                    Searching the archives
+                </div>
+
+                <div class="loading">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+            </div>
+        `;
+
+        chat.appendChild(message);
+    }
+
+
+    // =========================================================
+    // REMOVE LOADING
+    // =========================================================
+
+    function removeLoadingMessage() {
+
+        const loading =
+            document.getElementById(
+                "loadingMessage"
+            );
+
+        if (loading) {
+            loading.remove();
+        }
+    }
+
+
+    // =========================================================
+    // SEND QUESTION
+    // =========================================================
+
+    async function sendQuestion() {
+
+        const question =
+            questionInput.value.trim();
+
+        if (!question) {
+            return;
+        }
+
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        addUserMessage(question);
+
+        questionInput.value = "";
+
+        sendButton.disabled = true;
+
+        addLoadingMessage();
+
+        scrollToBottom();
+
+        try {
+
+            const response =
+                await fetch("/ask", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question,
+                        k: 2
+                    })
+
+                });
+
+
+            // -------------------------------------------------
+            // Handle non-JSON errors safely
+            // -------------------------------------------------
+
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                ) || "";
+
+            if (!response.ok) {
+
+                let errorMessage =
+                    "Something went wrong.";
+
+                if (
+                    contentType.includes(
+                        "application/json"
+                    )
+                ) {
+
+                    const errorData =
+                        await response.json();
+
+                    errorMessage =
+                        errorData.detail ||
+                        errorMessage;
+
+                } else {
+
+                    errorMessage =
+                        await response.text();
+
+                }
+
+                throw new Error(
+                    errorMessage
+                );
+            }
+
+
+            const data =
+                await response.json();
+
+
+            removeLoadingMessage();
+
+            addAssistantMessage(
+                data.answer ||
+                "I don't know based on the provided book.",
+                data.sources || []
+            );
+
+        }
+
+        catch (error) {
+
+            removeLoadingMessage();
+
+            addAssistantMessage(
+                "Sorry, I couldn't process that question."
+            );
+
+            console.error(
+                "RAG error:",
+                error
+            );
+
+        }
+
+        finally {
+
+            sendButton.disabled = false;
+
+            questionInput.focus();
+
+            scrollToBottom();
+        }
+    }
+
+
+    // =========================================================
+    // ENTER TO SEND
+    // =========================================================
+
+    questionInput.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendQuestion();
+            }
+
+        }
+    );
+
+
+    // =========================================================
+    // AUTO RESIZE TEXTAREA
+    // =========================================================
+
+    questionInput.addEventListener(
+        "input",
+        function() {
+
+            this.style.height = "auto";
+
+            this.style.height =
+                Math.min(
+                    this.scrollHeight,
+                    110
+                ) + "px";
+
+        }
+    );
+
+
+    // =========================================================
+    // SCROLL
+    // =========================================================
+
+    function scrollToBottom() {
+
+        setTimeout(() => {
+
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
+
+        }, 50);
+    }
+
+
+    // =========================================================
+    // HTML ESCAPE
+    // =========================================================
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
 </script>
+
 </body>
 </html>
