@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -30,7 +29,7 @@ INDEX_DIR = BASE_DIR / "faiss_index"
 
 app = FastAPI(
     title="Lightning Thief RAG",
-    version="3.0.0"
+    version="4.0.0"
 )
 
 
@@ -39,7 +38,9 @@ app = FastAPI(
 # ============================================================
 
 if not os.getenv("GOOGLE_API_KEY"):
-    raise RuntimeError("GOOGLE_API_KEY is not set.")
+    raise RuntimeError(
+        "GOOGLE_API_KEY is not set."
+    )
 
 
 # ============================================================
@@ -53,25 +54,25 @@ embeddings = GoogleGenerativeAIEmbeddings(
     model=EMBEDDING_MODEL
 )
 
-# Keep output small for faster response
 llm = ChatGoogleGenerativeAI(
     model=LLM_MODEL,
     temperature=0,
-    max_output_tokens=100
+    max_output_tokens=160
 )
+
 
 vector_store = None
 
 
 # ============================================================
-# BUILD VECTOR DATABASE
+# BUILD VECTOR STORE
 # ============================================================
 
 def build_vector_store():
 
     if not PDF_PATH.exists():
         raise FileNotFoundError(
-            f"PDF not found: {PDF_PATH}"
+            f"Book not found: {PDF_PATH}"
         )
 
     print("Loading book...")
@@ -88,7 +89,7 @@ def build_vector_store():
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=900,
-        chunk_overlap=80,
+        chunk_overlap=100,
         separators=[
             "\n\n",
             "\n",
@@ -102,20 +103,9 @@ def build_vector_store():
         documents
     )
 
-    for chunk in chunks:
-
-        page = chunk.metadata.get("page")
-
-        if page is not None:
-            chunk.metadata["page_number"] = (
-                int(page) + 1
-            )
-
     print(
         f"Created {len(chunks)} chunks."
     )
-
-    print("Creating FAISS index...")
 
     store = FAISS.from_documents(
         chunks,
@@ -126,13 +116,13 @@ def build_vector_store():
         str(INDEX_DIR)
     )
 
-    print("FAISS index ready.")
+    print("FAISS index created.")
 
     return store
 
 
 # ============================================================
-# LOAD EXISTING INDEX
+# LOAD OR BUILD INDEX
 # ============================================================
 
 def load_or_build_store():
@@ -152,6 +142,8 @@ def load_or_build_store():
             allow_dangerous_deserialization=True
         )
 
+    print("Building FAISS index...")
+
     return build_vector_store()
 
 
@@ -160,78 +152,106 @@ def load_or_build_store():
 # ============================================================
 
 @app.on_event("startup")
-def startup_event():
+def startup():
 
     global vector_store
 
     vector_store = load_or_build_store()
 
-    print("================================")
-    print("Lightning Thief RAG ONLINE")
-    print("================================")
+    print("===================================")
+    print("LIGHTNING THIEF RAG ONLINE")
+    print("===================================")
 
 
 # ============================================================
-# DATA MODELS
+# REQUEST MODEL
 # ============================================================
 
 class AskRequest(BaseModel):
+
     question: str
-    k: int = 2
-
-
-class SourceItem(BaseModel):
-    page: int | None = None
-    text: str
-
-
-class AskResponse(BaseModel):
-    answer: str
-    sources: List[SourceItem]
 
 
 # ============================================================
-# STRICT ANSWER PROMPT
+# RESPONSE MODEL
+# ============================================================
+
+class AskResponse(BaseModel):
+
+    answer: str
+
+
+# ============================================================
+# STRICT RAG PROMPT
 # ============================================================
 
 PROMPT = ChatPromptTemplate.from_template(
     """
-You answer questions ONLY about the book
+You are a book question-answering assistant.
+
+The only book you are allowed to answer questions about is:
+
 "The Lightning Thief" by Rick Riordan.
 
-BOOK CONTEXT:
+You have been given relevant passages from the book.
+
+BOOK PASSAGES:
 {context}
 
-QUESTION:
+USER QUESTION:
 {question}
 
-FOLLOW THESE RULES EXACTLY:
+Follow these rules:
 
-- Answer ONLY the question asked.
-- Use ONLY the BOOK CONTEXT.
-- Do NOT use outside knowledge.
-- Do NOT guess.
-- Do NOT add background information.
-- Do NOT add extra facts.
-- Do NOT explain your reasoning.
-- Do NOT repeat the question.
-- Do NOT summarize the context.
-- Do NOT mention the context.
-- Do NOT mention RAG, FAISS, AI, retrieval, chunks,
-  embeddings, or sources.
-- Do NOT say "according to the context".
-- Give the shortest useful answer.
-- Normally use ONE sentence.
-- Use TWO sentences only when necessary.
-- If the answer is not clearly supported by the
-  BOOK CONTEXT, respond EXACTLY:
+1. Answer the user's question directly.
+2. Use ONLY the information contained in the book passages.
+3. Never use outside knowledge.
+4. Never guess.
+5. Never invent facts.
+6. Never discuss anything unrelated to the question.
+7. Never repeat the book passages.
+8. Never explain your reasoning.
+9. Never mention RAG, AI, FAISS, embeddings, retrieval,
+   passages, context, or sources.
+10. Do not provide page numbers.
+11. Do not provide a list of sources.
+12. Do not say "according to the context".
+13. Give a natural human answer.
+14. Give enough information to actually answer the question.
+15. Do NOT answer with only a person's name unless the
+    question specifically asks for just a name.
+16. Normally answer in 1-3 sentences.
+17. If the question cannot be answered from the provided
+    book passages, say exactly:
 
 I don't know based on the provided book.
 
-IMPORTANT:
-If the question is about another book, movie, character,
-person, website, or unrelated topic, respond EXACTLY:
+Examples:
 
+Question:
+Who is Percy Jackson?
+
+Good answer:
+Percy Jackson is the twelve-year-old protagonist of
+The Lightning Thief and the son of Poseidon.
+
+Question:
+Who is Percy's father?
+
+Good answer:
+Percy's father is Poseidon.
+
+Question:
+Why is the master bolt important?
+
+Good answer:
+The master bolt is important because its theft threatens
+to cause a war among the Greek gods.
+
+Question:
+Tell me about Harry Potter.
+
+Good answer:
 I don't know based on the provided book.
 
 FINAL ANSWER:
@@ -240,17 +260,20 @@ FINAL ANSWER:
 
 
 # ============================================================
-# EXTRACT GEMINI TEXT
+# EXTRACT GEMINI RESPONSE
 # ============================================================
 
 def extract_text(content):
+
+    if content is None:
+        return ""
 
     if isinstance(content, str):
         return content.strip()
 
     if isinstance(content, list):
 
-        result = []
+        parts = []
 
         for item in content:
 
@@ -259,7 +282,7 @@ def extract_text(content):
                 text = item.get("text")
 
                 if text:
-                    result.append(
+                    parts.append(
                         str(text)
                     )
 
@@ -271,11 +294,15 @@ def extract_text(content):
                 )
 
                 if text:
-                    result.append(
+                    parts.append(
                         str(text)
                     )
 
-        return " ".join(result).strip()
+            elif isinstance(item, str):
+
+                parts.append(item)
+
+        return " ".join(parts).strip()
 
     return str(content).strip()
 
@@ -288,14 +315,14 @@ def clean_answer(answer):
 
     answer = answer.strip()
 
-    unwanted_prefixes = [
+    prefixes = [
         "FINAL ANSWER:",
         "Final Answer:",
-        "Answer:",
-        "ANSWER:"
+        "ANSWER:",
+        "Answer:"
     ]
 
-    for prefix in unwanted_prefixes:
+    for prefix in prefixes:
 
         if answer.startswith(prefix):
 
@@ -312,7 +339,7 @@ def clean_answer(answer):
 
 
 # ============================================================
-# HOME PAGE
+# HOME
 # ============================================================
 
 @app.get("/")
@@ -347,7 +374,7 @@ def health():
 
 
 # ============================================================
-# ASK QUESTION
+# ASK
 # ============================================================
 
 @app.post(
@@ -376,7 +403,7 @@ def ask(request: AskRequest):
         vector_store = load_or_build_store()
 
     # --------------------------------------------------------
-    # Retrieve ONLY 2 relevant chunks
+    # Retrieve only 2 relevant chunks
     # --------------------------------------------------------
 
     try:
@@ -397,53 +424,26 @@ def ask(request: AskRequest):
             detail="Book search failed."
         )
 
-    # --------------------------------------------------------
-    # No relevant content
-    # --------------------------------------------------------
-
     if not docs:
 
         return AskResponse(
             answer=(
                 "I don't know based on "
                 "the provided book."
-            ),
-            sources=[]
-        )
-
-    # --------------------------------------------------------
-    # Create SMALL context
-    # --------------------------------------------------------
-
-    context_parts = []
-    sources = []
-
-    for doc in docs:
-
-        text = doc.page_content.strip()
-
-        page = doc.metadata.get(
-            "page_number"
-        )
-
-        context_parts.append(
-            f"[Page {page}]\n{text}"
-        )
-
-        # Only page number goes to frontend
-        sources.append(
-            SourceItem(
-                page=page,
-                text=""
             )
         )
 
+    # --------------------------------------------------------
+    # Create context
+    # --------------------------------------------------------
+
     context = "\n\n".join(
-        context_parts
+        doc.page_content.strip()
+        for doc in docs
     )
 
     # --------------------------------------------------------
-    # Ask Gemini
+    # Generate answer
     # --------------------------------------------------------
 
     try:
@@ -453,9 +453,7 @@ def ask(request: AskRequest):
             question=question
         )
 
-        result = llm.invoke(
-            prompt
-        )
+        result = llm.invoke(prompt)
 
         answer = extract_text(
             result.content
@@ -473,11 +471,11 @@ def ask(request: AskRequest):
 
         raise HTTPException(
             status_code=500,
-            detail="Answer generation failed."
+            detail="Failed to generate answer."
         )
 
     # --------------------------------------------------------
-    # Final fallback
+    # Safety fallback
     # --------------------------------------------------------
 
     if not answer:
@@ -488,12 +486,15 @@ def ask(request: AskRequest):
         )
 
     # --------------------------------------------------------
-    # RETURN
+    # IMPORTANT:
+    # Return ONLY the answer.
+    # No pages.
+    # No sources.
+    # No book1/book2.
     # --------------------------------------------------------
 
     return AskResponse(
-        answer=answer,
-        sources=sources
+        answer=answer
     )
 
 
