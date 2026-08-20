@@ -29,8 +29,8 @@ PDF_PATH = BASE_DIR / "The_Lightning_Thief.pdf"
 INDEX_DIR = BASE_DIR / "faiss_index"
 
 app = FastAPI(
-    title="The Lightning Thief RAG",
-    version="2.0.0",
+    title="Lightning Thief Assistant",
+    version="3.0.0",
 )
 
 
@@ -51,12 +51,11 @@ if not GOOGLE_API_KEY:
 # MODELS
 # ============================================================
 
-# Embedding model
+# Fast embedding model
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 
 # IMPORTANT:
 # Do NOT use gemini-2.5-flash.
-# Render's current API response says to use gemini-3.6-flash.
 LLM_MODEL = "gemini-3.6-flash"
 
 
@@ -66,11 +65,12 @@ embeddings = GoogleGenerativeAIEmbeddings(
 )
 
 
+# Keep generation short for faster responses
 llm = ChatGoogleGenerativeAI(
     model=LLM_MODEL,
     google_api_key=GOOGLE_API_KEY,
     temperature=0,
-    max_output_tokens=250,
+    max_output_tokens=180,
 )
 
 
@@ -83,13 +83,13 @@ vector_store = None
 
 def build_vector_store():
     """
-    Read the PDF, split it into chunks, create embeddings,
-    and save the FAISS index.
+    Load the PDF, split it into chunks,
+    create embeddings and save the FAISS index.
     """
 
     if not PDF_PATH.exists():
         raise FileNotFoundError(
-            f"Book PDF not found at: {PDF_PATH}"
+            f"The book PDF was not found:\n{PDF_PATH}"
         )
 
     print("Loading The Lightning Thief PDF...")
@@ -100,12 +100,14 @@ def build_vector_store():
     print(f"Loaded {len(documents)} PDF pages.")
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=120,
+        chunk_size=900,
+        chunk_overlap=100,
         separators=[
             "\n\n",
             "\n",
             ". ",
+            "? ",
+            "! ",
             " ",
             "",
         ],
@@ -115,14 +117,14 @@ def build_vector_store():
 
     print(f"Created {len(chunks)} chunks.")
 
-    # Add readable page numbers
+    # Add readable page numbers to metadata
     for chunk in chunks:
         page = chunk.metadata.get("page")
 
         if page is not None:
             chunk.metadata["page_number"] = int(page) + 1
 
-    print("Creating FAISS embeddings...")
+    print("Creating embeddings...")
 
     store = FAISS.from_documents(
         chunks,
@@ -138,8 +140,8 @@ def build_vector_store():
 
 def load_or_build_store():
     """
-    Load existing FAISS index if available.
-    Otherwise build it from the PDF.
+    Load existing FAISS index.
+    If it doesn't exist, create it.
     """
 
     index_file = INDEX_DIR / "index.faiss"
@@ -155,7 +157,7 @@ def load_or_build_store():
             allow_dangerous_deserialization=True,
         )
 
-    print("FAISS index not found. Building index...")
+    print("FAISS index not found.")
 
     return build_vector_store()
 
@@ -171,10 +173,10 @@ def startup_event():
 
     try:
         vector_store = load_or_build_store()
-        print("RAG system is ready.")
+        print("Lightning Thief RAG is ready.")
 
     except Exception as e:
-        print(f"Startup error: {e}")
+        print(f"Startup error: {repr(e)}")
         raise
 
 
@@ -184,7 +186,7 @@ def startup_event():
 
 class AskRequest(BaseModel):
     question: str
-    k: int = 3
+    k: int = 2
 
 
 class SourceItem(BaseModel):
@@ -198,49 +200,55 @@ class AskResponse(BaseModel):
 
 
 # ============================================================
-# RAG PROMPT
+# STRICT ANSWER PROMPT
 # ============================================================
 
 PROMPT = ChatPromptTemplate.from_template(
     """
-You are a question-answering assistant for the book
+You answer questions ONLY about the book
 "The Lightning Thief" by Rick Riordan.
 
-Your ONLY job is to answer the user's question using the
-retrieved book content.
+Your task is very simple:
+
+Answer ONLY the user's question.
 
 STRICT RULES:
 
-1. Answer ONLY the user's question.
-2. Use ONLY information supported by the retrieved context.
-3. Do NOT use outside knowledge.
-4. Do NOT mention the retrieved context.
-5. Do NOT mention chunks.
-6. Do NOT mention embeddings.
-7. Do NOT mention FAISS.
-8. Do NOT mention RAG.
-9. Do NOT mention page numbers.
-10. Do NOT list sources.
-11. Do NOT summarize unrelated parts of the book.
-12. Do NOT repeat the question.
-13. Keep the answer short and direct.
-14. Normally answer in 1-3 sentences.
-15. If the retrieved context does not contain enough information
-    to answer the question, respond exactly:
-
+1. Use ONLY the supplied book text.
+2. Do NOT use outside knowledge.
+3. Do NOT guess.
+4. Do NOT invent information.
+5. Ignore unrelated retrieved text.
+6. Do NOT mention retrieved text.
+7. Do NOT mention context.
+8. Do NOT mention chunks.
+9. Do NOT mention embeddings.
+10. Do NOT mention FAISS.
+11. Do NOT mention RAG.
+12. Do NOT mention sources.
+13. Do NOT mention page numbers.
+14. Do NOT repeat the question.
+15. Do NOT discuss unrelated characters or events.
+16. Do NOT provide a general summary unless specifically asked.
+17. Answer in 1-3 short sentences.
+18. Be direct and specific.
+19. If the question is unrelated to The Lightning Thief, say:
+"I don't know based on the book."
+20. If the supplied text does not contain enough information to answer,
+say exactly:
 "I don't know based on the book."
 
 IMPORTANT:
-The retrieved context may contain unrelated information.
-Ignore anything that does not directly help answer the question.
+The retrieved text can contain information unrelated to the question.
+Use ONLY the part that directly answers the question.
 
-Retrieved book content:
+BOOK TEXT:
 {context}
 
-User question:
+QUESTION:
 {question}
 
-Answer:
+ANSWER:
 """
 )
 
@@ -251,10 +259,7 @@ Answer:
 
 def extract_text(content: Any) -> str:
     """
-    Gemini can return content either as a normal string
-    or as a list of content blocks.
-
-    This function safely converts either format into a string.
+    Safely extract text from Gemini's response.
     """
 
     if content is None:
@@ -264,7 +269,7 @@ def extract_text(content: Any) -> str:
     if isinstance(content, str):
         return content.strip()
 
-    # Gemini content blocks
+    # List response
     if isinstance(content, list):
 
         parts = []
@@ -290,7 +295,6 @@ def extract_text(content: Any) -> str:
 
         return " ".join(parts).strip()
 
-    # Fallback
     return str(content).strip()
 
 
@@ -300,6 +304,9 @@ def extract_text(content: Any) -> str:
 
 def clean_answer(answer: str) -> str:
 
+    if not answer:
+        return "I don't know based on the book."
+
     answer = answer.strip()
 
     # Remove accidental prefixes
@@ -308,6 +315,7 @@ def clean_answer(answer: str) -> str:
         "Answer -",
         "Answer:",
         "Response:",
+        "Response -",
     ]
 
     for prefix in prefixes:
@@ -315,14 +323,27 @@ def clean_answer(answer: str) -> str:
         if answer.lower().startswith(prefix.lower()):
             answer = answer[len(prefix):].strip()
 
-    # Prevent the model from dumping internal information
+    # Remove markdown fences if Gemini adds them
+    answer = answer.replace("```text", "")
+    answer = answer.replace("```", "")
+    answer = answer.strip()
+
+    # Internal words that should NEVER appear
     forbidden_phrases = [
-        "retrieved context:",
+        "retrieved context",
         "book page",
+        "retrieved text",
+        "context:",
         "chunk",
+        "chunks",
         "faiss",
         "embedding",
+        "embeddings",
         "rag",
+        "vector store",
+        "vectorstore",
+        "source:",
+        "sources:",
     ]
 
     lower_answer = answer.lower()
@@ -332,6 +353,7 @@ def clean_answer(answer: str) -> str:
         if phrase in lower_answer:
             return "I don't know based on the book."
 
+    # Remove accidental question repetition
     if not answer:
         return "I don't know based on the book."
 
@@ -393,29 +415,56 @@ def ask(request: AskRequest):
             detail="Question cannot be empty."
         )
 
-    # Load index if necessary
+    # Make sure vector store exists
     if vector_store is None:
-
         vector_store = load_or_build_store()
 
-    # Keep retrieval small for faster response
+    # --------------------------------------------------------
+    # Keep retrieval small for speed
+    # --------------------------------------------------------
+
     k = max(
         1,
-        min(request.k, 3)
+        min(request.k, 2)
     )
 
     try:
 
         # ----------------------------------------------------
-        # RETRIEVE ONLY A FEW RELEVANT CHUNKS
+        # Retrieve relevant documents
         # ----------------------------------------------------
 
-        docs = vector_store.similarity_search(
+        results = vector_store.similarity_search_with_relevance_scores(
             question,
-            k=k,
+            k=k
         )
 
-        if not docs:
+        # ----------------------------------------------------
+        # Remove weak matches
+        # ----------------------------------------------------
+
+        relevant_docs = []
+
+        for doc, score in results:
+
+            # Higher score = more relevant
+            if score >= 0.30:
+                relevant_docs.append(doc)
+
+        # If relevance filtering removed everything,
+        # use the best result only if it is reasonably close.
+        if not relevant_docs and results:
+
+            best_doc, best_score = results[0]
+
+            if best_score >= 0.20:
+                relevant_docs = [best_doc]
+
+        # ----------------------------------------------------
+        # No relevant information
+        # ----------------------------------------------------
+
+        if not relevant_docs:
 
             return AskResponse(
                 answer="I don't know based on the book.",
@@ -423,20 +472,19 @@ def ask(request: AskRequest):
             )
 
         # ----------------------------------------------------
-        # BUILD SMALL CONTEXT
+        # Build SMALL context
         # ----------------------------------------------------
 
         context_parts = []
 
-        for doc in docs:
+        for doc in relevant_docs:
 
-            content = doc.page_content.strip()
+            text = doc.page_content.strip()
 
-            if content:
+            if text:
+                context_parts.append(text)
 
-                context_parts.append(content)
-
-        context = "\n\n---\n\n".join(context_parts)
+        context = "\n\n".join(context_parts)
 
         if not context:
 
@@ -446,7 +494,14 @@ def ask(request: AskRequest):
             )
 
         # ----------------------------------------------------
-        # ASK GEMINI
+        # Limit context size
+        # ----------------------------------------------------
+
+        # This helps response speed and keeps Gemini focused.
+        context = context[:7000]
+
+        # ----------------------------------------------------
+        # Generate answer
         # ----------------------------------------------------
 
         prompt = PROMPT.format_messages(
@@ -457,29 +512,29 @@ def ask(request: AskRequest):
         result = llm.invoke(prompt)
 
         # ----------------------------------------------------
-        # FIX GEMINI LIST RESPONSE
+        # Extract Gemini response
         # ----------------------------------------------------
 
-        answer = extract_text(
-            result.content
-        )
+        answer = extract_text(result.content)
+
+        # ----------------------------------------------------
+        # Clean response
+        # ----------------------------------------------------
 
         answer = clean_answer(answer)
 
         # ----------------------------------------------------
-        # SOURCES
+        # Sources
         #
-        # Keep these in API response for the frontend if needed,
-        # but DO NOT include them inside the answer.
+        # They remain available to the frontend API,
+        # but they are NOT included in the answer.
         # ----------------------------------------------------
 
         sources = []
 
-        for doc in docs:
+        for doc in relevant_docs:
 
-            page = doc.metadata.get(
-                "page_number"
-            )
+            page = doc.metadata.get("page_number")
 
             text = (
                 doc.page_content
@@ -490,9 +545,13 @@ def ask(request: AskRequest):
             sources.append(
                 SourceItem(
                     page=page,
-                    text=text[:300],
+                    text=text[:250],
                 )
             )
+
+        # ----------------------------------------------------
+        # Return ONLY the answer + hidden source data
+        # ----------------------------------------------------
 
         return AskResponse(
             answer=answer,
