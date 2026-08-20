@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Lightning Thief Archives</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -18,28 +23,47 @@
         body {
             margin: 0;
             min-height: 100vh;
+
             background:
-                radial-gradient(circle at 15% 10%, rgba(232, 166, 55, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 80%, rgba(20, 75, 120, 0.10), transparent 30%),
-                #070c14;
-            color: #f4f6f8;
-            font-family: Arial, Helvetica, sans-serif;
+                radial-gradient(
+                    circle at 15% 10%,
+                    rgba(214, 151, 48, 0.08),
+                    transparent 28%
+                ),
+                #080d15;
+
+            color: #f4f5f7;
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
         }
+
+        /* =====================================================
+           MAIN PAGE
+        ===================================================== */
 
         .page {
-            width: min(1180px, calc(100% - 60px));
+            width: min(1180px, 92%);
             margin: 0 auto;
-            padding: 30px 0 40px;
+            padding: 42px 0 35px;
         }
 
-        /* HEADER */
+        /* =====================================================
+           HEADER
+        ===================================================== */
 
-        .topbar {
+        .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 22px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            padding-bottom: 28px;
+
+            border-bottom: 1px solid #202834;
         }
 
         .brand {
@@ -48,28 +72,45 @@
             gap: 14px;
         }
 
-        .brand-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 13px;
+        .logo {
+            width: 44px;
+            height: 44px;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(145deg, #f2b94b, #a96d18);
-            color: #101010;
-            font-size: 28px;
-            font-weight: bold;
-            box-shadow: 0 8px 25px rgba(232,166,55,0.18);
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #e8ad43,
+                    #b97819
+                );
+
+            color: #10151d;
+
+            font-size: 25px;
+            font-weight: 900;
+
+            box-shadow:
+                0 8px 25px rgba(225, 163, 58, 0.18);
         }
 
         .brand-text h2 {
             margin: 0;
-            font-size: 20px;
+
+            font-size: 17px;
+            font-weight: 750;
+            letter-spacing: -0.3px;
         }
 
         .brand-text p {
-            margin: 4px 0 0;
-            color: #8192aa;
+            margin: 3px 0 0;
+
+            color: #8290a4;
+
             font-size: 13px;
         }
 
@@ -77,237 +118,440 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 9px 15px;
-            border-radius: 30px;
-            border: 1px solid rgba(77, 218, 150, 0.25);
-            background: rgba(30, 80, 65, 0.16);
-            color: #69e7a8;
+
+            padding: 9px 14px;
+
+            border: 1px solid #273443;
+            border-radius: 999px;
+
+            color: #77e5ae;
+
+            background: rgba(18, 29, 42, 0.75);
+
             font-size: 13px;
         }
 
         .status-dot {
             width: 7px;
             height: 7px;
+
             border-radius: 50%;
-            background: #5be7a1;
-            box-shadow: 0 0 10px #5be7a1;
+
+            background: #58e99e;
+
+            box-shadow:
+                0 0 10px rgba(88, 233, 158, 0.7);
         }
 
-        /* HERO */
+        /* =====================================================
+           HERO
+        ===================================================== */
 
         .hero {
-            padding: 38px 0 28px;
+            padding: 52px 0 30px;
         }
 
         .eyebrow {
-            color: #e8a637;
+            margin-bottom: 13px;
+
+            color: #e7a637;
+
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 750;
+
             letter-spacing: 2px;
-            margin-bottom: 12px;
+            text-transform: uppercase;
         }
 
         .hero h1 {
-            max-width: 800px;
+            max-width: 850px;
+
             margin: 0;
+
             font-size: clamp(42px, 6vw, 72px);
+
             line-height: 0.98;
+
             letter-spacing: -3px;
+
+            font-weight: 850;
         }
 
         .hero h1 span {
-            color: #e8a637;
+            color: #e7a637;
         }
 
         .hero p {
-            margin-top: 20px;
-            color: #8fa0b8;
+            max-width: 720px;
+
+            margin: 22px 0 0;
+
+            color: #8e9db2;
+
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        /* QUICK QUESTIONS */
+        /* =====================================================
+           SUGGESTIONS
+        ===================================================== */
 
-        .quick-title {
-            color: #75859b;
+        .try-label {
+            margin: 8px 0 11px;
+
+            color: #718097;
+
             font-size: 11px;
             letter-spacing: 1.5px;
+
             text-transform: uppercase;
-            margin-bottom: 10px;
         }
 
-        .quick-buttons {
+        .suggestions {
             display: flex;
             flex-wrap: wrap;
             gap: 9px;
-            margin-bottom: 35px;
         }
 
-        .quick-btn {
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.025);
-            color: #c8d4e2;
+        .suggestion {
             padding: 10px 14px;
+
+            border: 1px solid #2a3543;
             border-radius: 9px;
-            cursor: pointer;
+
+            background: #10161f;
+
+            color: #b9c5d4;
+
             font-size: 13px;
-            transition: 0.2s ease;
+
+            cursor: pointer;
+
+            transition:
+                border-color 0.18s ease,
+                background 0.18s ease,
+                transform 0.18s ease;
         }
 
-        .quick-btn:hover {
-            border-color: #d89a31;
-            color: #f4c264;
-            background: rgba(232,166,55,0.07);
+        .suggestion:hover {
+            border-color: #b77c25;
+            background: #151c26;
+
+            transform: translateY(-1px);
         }
 
-        /* CHAT */
+        /* =====================================================
+           CHAT PANEL
+        ===================================================== */
 
-        .chat-box {
-            border: 1px solid rgba(255,255,255,0.10);
+        .chat {
+            margin-top: 52px;
+
+            border: 1px solid #26303c;
             border-radius: 20px;
-            background: rgba(11,17,27,0.78);
+
+            background: rgba(10, 15, 23, 0.9);
+
             overflow: hidden;
-            box-shadow: 0 20px 70px rgba(0,0,0,0.25);
+
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.22);
         }
 
         .chat-header {
             height: 62px;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
+
             padding: 0 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            border-bottom: 1px solid #202934;
         }
 
         .assistant-name {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: bold;
+
             font-size: 14px;
+            font-weight: 700;
         }
 
-        .mini-icon {
+        .assistant-icon {
             width: 30px;
             height: 30px;
-            border-radius: 8px;
+
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: rgba(232,166,55,0.14);
-            color: #e8a637;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #26211a;
+
+            color: #e4a336;
+
+            font-size: 16px;
         }
 
         .chat-label {
-            color: #6f8198;
+            color: #738198;
+
             font-size: 12px;
         }
 
-        /* MESSAGE AREA */
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
 
         .messages {
             padding: 26px;
-            min-height: 320px;
-            max-height: 620px;
-            overflow-y: auto;
-        }
 
-        .message {
             display: flex;
-            margin-bottom: 22px;
+            flex-direction: column;
+            gap: 24px;
+
+            /*
+              IMPORTANT:
+              No fixed height.
+              No overflow:hidden.
+              This allows the answer to grow normally.
+            */
         }
 
-        .message.user {
-            justify-content: flex-end;
-        }
+        .welcome {
+            padding: 30px;
 
-        .user-bubble {
-            max-width: 75%;
-            padding: 13px 17px;
-            border-radius: 14px 14px 3px 14px;
-            background: #15334b;
-            border: 1px solid rgba(75,151,205,0.25);
-            color: #e9f2fa;
+            border: 1px solid #252f3a;
+            border-radius: 14px;
+
+            background: #101721;
+
+            color: #9ba9bb;
+
+            text-align: center;
+
+            line-height: 1.7;
+
             font-size: 14px;
-            line-height: 1.5;
         }
 
-        /* IMPORTANT:
-           ANSWER CARD HAS NO FIXED WIDTH OR HEIGHT
-        */
-
-        .assistant-message {
-            width: 100%;
+        .welcome strong {
+            color: #f0f2f5;
         }
 
-        .answer-card {
+        /* USER MESSAGE */
+
+        .message-user {
+            align-self: flex-end;
+
+            max-width: 72%;
+
+            padding: 13px 17px;
+
+            border: 1px solid #294d68;
+            border-radius: 14px 14px 4px 14px;
+
+            background: #102b3f;
+
+            color: #edf4fa;
+
+            font-size: 14px;
+
+            line-height: 1.55;
+
+            word-break: break-word;
+        }
+
+        /* ASSISTANT MESSAGE */
+
+        .message-assistant {
             width: 100%;
-            max-width: 100%;
-            display: block;
 
-            padding: 20px 22px;
+            padding: 24px;
 
-            border-radius: 15px;
+            border: 1px solid #28323e;
+
+            border-radius: 14px;
 
             background: #101821;
-            border: 1px solid rgba(255,255,255,0.09);
+        }
+
+        .assistant-label {
+            margin-bottom: 14px;
+
+            color: #e5a335;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+
+            text-transform: uppercase;
+        }
+
+        /*
+          IMPORTANT FIX:
+          The answer is allowed to use its natural height.
+          No max-height.
+          No fixed height.
+          No overflow:hidden.
+        */
+
+        .answer {
+            width: 100%;
 
             color: #e8edf3;
 
             font-size: 15px;
+
             line-height: 1.75;
 
             white-space: pre-wrap;
+
             overflow-wrap: anywhere;
+
             word-break: normal;
-
-            height: auto;
-            min-height: 0;
-            overflow: visible;
         }
 
-        .answer-label {
-            color: #e8a637;
-            font-size: 10px;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            text-transform: uppercase;
+        /* ERROR */
+
+        .message-error {
+            padding: 16px 18px;
+
+            border: 1px solid #71343b;
+            border-radius: 12px;
+
+            background: #211419;
+
+            color: #ff9da5;
+
+            font-size: 14px;
+
+            line-height: 1.5;
         }
 
-        .answer-text {
-            width: 100%;
-            max-width: 100%;
+        /* =====================================================
+           INPUT AREA
+        ===================================================== */
 
-            color: #e8edf3;
+        .input-area {
+            display: flex;
+            gap: 10px;
 
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
+            padding: 14px;
 
-            line-height: 1.75;
+            border-top: 1px solid #202934;
+
+            background: #0a1018;
         }
 
-        /* LOADING */
+        #question {
+            flex: 1;
+
+            min-width: 0;
+
+            height: 52px;
+
+            padding: 0 17px;
+
+            border: 1px solid #6f4c19;
+            border-radius: 12px;
+
+            outline: none;
+
+            background: #0c131d;
+
+            color: #edf2f7;
+
+            font-size: 14px;
+
+            transition:
+                border-color 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        #question::placeholder {
+            color: #637288;
+        }
+
+        #question:focus {
+            border-color: #d39a38;
+
+            box-shadow:
+                0 0 0 3px rgba(211, 154, 56, 0.08);
+        }
+
+        #askButton {
+            width: 54px;
+            height: 52px;
+
+            border: none;
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #edb44d,
+                    #c98522
+                );
+
+            color: #10151c;
+
+            font-size: 22px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.18s ease,
+                opacity 0.18s ease;
+        }
+
+        #askButton:hover {
+            transform: translateY(-1px);
+        }
+
+        #askButton:disabled {
+            opacity: 0.45;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
 
         .loading {
-            display: flex;
+            display: inline-flex;
+
             align-items: center;
+
             gap: 8px;
-            color: #8da0b8;
+
+            color: #9ba8b9;
+
             font-size: 14px;
         }
 
         .loading-dots {
-            display: flex;
+            display: inline-flex;
             gap: 4px;
         }
 
         .loading-dots span {
-            width: 6px;
-            height: 6px;
-            background: #e8a637;
+            width: 5px;
+            height: 5px;
+
             border-radius: 50%;
-            animation: bounce 1s infinite;
+
+            background: #dca03c;
+
+            animation: pulse 1s infinite;
         }
 
         .loading-dots span:nth-child(2) {
@@ -318,116 +562,47 @@
             animation-delay: 0.3s;
         }
 
-        @keyframes bounce {
-            0%, 80%, 100% {
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.25;
                 transform: translateY(0);
-                opacity: 0.4;
             }
 
-            40% {
-                transform: translateY(-5px);
+            50% {
                 opacity: 1;
+                transform: translateY(-2px);
             }
         }
 
-        /* INPUT */
-
-        .input-area {
-            padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .input-form {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
-
-        #question {
-            flex: 1;
-            min-width: 0;
-
-            border: 1px solid rgba(232,166,55,0.35);
-            outline: none;
-
-            background: #0c131d;
-            color: white;
-
-            border-radius: 12px;
-
-            padding: 15px 17px;
-
-            font-size: 14px;
-        }
-
-        #question::placeholder {
-            color: #61738b;
-        }
-
-        #question:focus {
-            border-color: #e8a637;
-            box-shadow: 0 0 0 3px rgba(232,166,55,0.07);
-        }
-
-        #askButton {
-            width: 52px;
-            border: none;
-            border-radius: 12px;
-
-            background: linear-gradient(145deg, #efb445, #c88720);
-
-            color: #111;
-            font-size: 21px;
-            font-weight: bold;
-
-            cursor: pointer;
-
-            transition: 0.2s ease;
-        }
-
-        #askButton:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.08);
-        }
-
-        #askButton:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-            transform: none;
-        }
-
-        /* ERROR */
-
-        .error-card {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            background: rgba(180,50,50,0.10);
-            border: 1px solid rgba(220,80,80,0.25);
-            color: #ff9b9b;
-            line-height: 1.5;
-        }
-
-        /* FOOTER */
+        /* =====================================================
+           FOOTER
+        ===================================================== */
 
         .footer {
             display: flex;
             justify-content: space-between;
-            color: #53657c;
+
+            margin-top: 18px;
+
+            color: #536176;
+
             font-size: 11px;
-            padding-top: 18px;
         }
 
-        /* MOBILE */
+        /* =====================================================
+           MOBILE
+        ===================================================== */
 
         @media (max-width: 700px) {
 
             .page {
-                width: calc(100% - 28px);
-                padding-top: 20px;
+                width: 94%;
+                padding-top: 25px;
             }
 
-            .topbar {
+            .header {
                 align-items: flex-start;
             }
 
@@ -435,29 +610,41 @@
                 display: none;
             }
 
+            .hero {
+                padding-top: 38px;
+            }
+
             .hero h1 {
-                font-size: 45px;
+                font-size: 44px;
+
                 letter-spacing: -2px;
             }
 
+            .chat {
+                margin-top: 35px;
+            }
+
             .messages {
-                padding: 18px;
-            }
-
-            .user-bubble {
-                max-width: 90%;
-            }
-
-            .answer-card {
                 padding: 17px;
-                font-size: 14px;
+            }
+
+            .message-user {
+                max-width: 88%;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            #askButton {
+                width: 50px;
             }
 
             .footer {
-                flex-direction: column;
-                gap: 7px;
+                padding-bottom: 15px;
             }
         }
+
     </style>
 </head>
 
@@ -465,35 +652,51 @@
 
 <div class="page">
 
-    <!-- HEADER -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-    <header class="topbar">
+    <header class="header">
 
         <div class="brand">
 
-            <div class="brand-icon">ϟ</div>
+            <div class="logo">
+                ⚡
+            </div>
 
             <div class="brand-text">
-                <h2>Lightning Thief Archives</h2>
-                <p>Ask questions. Search the story.</p>
+
+                <h2>
+                    Lightning Thief Archives
+                </h2>
+
+                <p>
+                    Ask questions. Search the story.
+                </p>
+
             </div>
 
         </div>
 
         <div class="status">
+
             <span class="status-dot"></span>
+
             RAG Online
+
         </div>
 
     </header>
 
 
-    <!-- HERO -->
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
     <section class="hero">
 
         <div class="eyebrow">
-            CAMP HALF-BLOOD KNOWLEDGE BASE
+            Camp Half-Blood Knowledge Base
         </div>
 
         <h1>
@@ -502,49 +705,67 @@
         </h1>
 
         <p>
-            Ask about characters, quests, monsters, locations, events,
-            or anything contained in the book.
+            Ask about characters, quests, monsters, locations,
+            events, or anything contained in the book.
         </p>
 
     </section>
 
 
-    <!-- QUICK QUESTIONS -->
+    <!-- =====================================================
+         SUGGESTIONS
+    ====================================================== -->
 
-    <div class="quick-title">
+    <div class="try-label">
         Try a question
     </div>
 
-    <div class="quick-buttons">
+    <div class="suggestions">
 
-        <button class="quick-btn" onclick="askQuick('Who is Percy Jackson?')">
+        <button
+            class="suggestion"
+            onclick="askSuggestion('Who is Percy Jackson?')"
+        >
             Who is Percy Jackson?
         </button>
 
-        <button class="quick-btn" onclick="askQuick('Why is the master bolt important?')">
+        <button
+            class="suggestion"
+            onclick="askSuggestion('Why is the master bolt important?')"
+        >
             Why is the master bolt important?
         </button>
 
-        <button class="quick-btn" onclick="askQuick('Who betrays Percy?')">
+        <button
+            class="suggestion"
+            onclick="askSuggestion('Who betrays Percy?')"
+        >
             Who betrays Percy?
         </button>
 
-        <button class="quick-btn" onclick="askQuick('What happens at the Lotus Casino?')">
+        <button
+            class="suggestion"
+            onclick="askSuggestion('What happens at the Lotus Casino?')"
+        >
             What happens at the Lotus Casino?
         </button>
 
     </div>
 
 
-    <!-- CHAT -->
+    <!-- =====================================================
+         CHAT
+    ====================================================== -->
 
-    <section class="chat-box">
+    <section class="chat">
 
         <div class="chat-header">
 
             <div class="assistant-name">
 
-                <div class="mini-icon">ϟ</div>
+                <div class="assistant-icon">
+                    ⚡
+                </div>
 
                 Lightning Thief Assistant
 
@@ -557,56 +778,61 @@
         </div>
 
 
-        <!-- MESSAGES -->
+        <!-- =================================================
+             MESSAGES
+        ================================================== -->
 
-        <div id="messages" class="messages">
+        <div
+            id="messages"
+            class="messages"
+        >
 
-            <!-- Initial message -->
-
-            <div class="message assistant-message">
-
-                <div class="answer-card">
-
-                    <div class="answer-label">
-                        ARCHIVE ASSISTANT
-                    </div>
-
-                    <div class="answer-text">
-                        Ask me a question about The Lightning Thief.
-                    </div>
-
-                </div>
-
+            <div
+                id="welcome"
+                class="welcome"
+            >
+                <strong>
+                    Ask me a question about The Lightning Thief.
+                </strong>
+                <br>
+                I'll answer using the book.
             </div>
 
         </div>
 
 
-        <!-- INPUT -->
+        <!-- =================================================
+             INPUT
+        ================================================== -->
 
-        <div class="input-area">
+        <form
+            id="askForm"
+            class="input-area"
+        >
 
-            <form id="questionForm" class="input-form">
+            <input
+                id="question"
+                type="text"
+                autocomplete="off"
+                placeholder="Ask something about The Lightning Thief..."
+            >
 
-                <input
-                    id="question"
-                    type="text"
-                    autocomplete="off"
-                    placeholder="Ask something about The Lightning Thief..."
-                >
+            <button
+                id="askButton"
+                type="submit"
+                aria-label="Ask"
+            >
+                ↑
+            </button>
 
-                <button id="askButton" type="submit">
-                    ↑
-                </button>
-
-            </form>
-
-        </div>
+        </form>
 
     </section>
 
 
-    <!-- FOOTER -->
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
     <footer class="footer">
 
@@ -625,29 +851,54 @@
 
 <script>
 
-    const form = document.getElementById("questionForm");
-    const input = document.getElementById("question");
-    const button = document.getElementById("askButton");
-    const messages = document.getElementById("messages");
+    /* ========================================================
+       ELEMENTS
+    ======================================================== */
+
+    const form =
+        document.getElementById("askForm");
+
+    const input =
+        document.getElementById("question");
+
+    const button =
+        document.getElementById("askButton");
+
+    const messages =
+        document.getElementById("messages");
+
+    const welcome =
+        document.getElementById("welcome");
 
 
-    /*
-     * ADD USER MESSAGE
-     */
+    /* ========================================================
+       ASK SUGGESTION
+    ======================================================== */
 
-    function addUserMessage(text) {
+    function askSuggestion(question) {
 
-        const message = document.createElement("div");
+        input.value = question;
 
-        message.className = "message user";
+        input.focus();
 
-        const bubble = document.createElement("div");
+        submitQuestion(question);
+    }
 
-        bubble.className = "user-bubble";
 
-        bubble.textContent = text;
+    /* ========================================================
+       ADD USER MESSAGE
+    ======================================================== */
 
-        message.appendChild(bubble);
+    function addUserMessage(question) {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message-user";
+
+        message.textContent =
+            question;
 
         messages.appendChild(message);
 
@@ -655,38 +906,41 @@
     }
 
 
-    /*
-     * ADD LOADING MESSAGE
-     */
+    /* ========================================================
+       ADD LOADING MESSAGE
+    ======================================================== */
 
     function addLoadingMessage() {
 
-        const message = document.createElement("div");
+        const message =
+            document.createElement("div");
 
-        message.className = "message assistant-message";
+        message.className =
+            "message-assistant";
 
-        message.id = "loadingMessage";
+        message.id =
+            "currentLoading";
 
         message.innerHTML = `
-            <div class="answer-card">
 
-                <div class="answer-label">
-                    ARCHIVE ASSISTANT
-                </div>
+            <div class="assistant-label">
+                Archive Assistant
+            </div>
 
-                <div class="loading">
+            <div class="loading">
 
-                    Finding the answer
+                Finding the answer
 
-                    <div class="loading-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                <span class="loading-dots">
 
-                </div>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </span>
 
             </div>
+
         `;
 
         messages.appendChild(message);
@@ -695,13 +949,16 @@
     }
 
 
-    /*
-     * REMOVE LOADING
-     */
+    /* ========================================================
+       REMOVE LOADING
+    ======================================================== */
 
     function removeLoadingMessage() {
 
-        const loading = document.getElementById("loadingMessage");
+        const loading =
+            document.getElementById(
+                "currentLoading"
+            );
 
         if (loading) {
             loading.remove();
@@ -709,79 +966,50 @@
     }
 
 
-    /*
-     * ADD ANSWER
-     *
-     * IMPORTANT:
-     * We ONLY display "answer".
-     *
-     * We DO NOT display:
-     * - sources
-     * - book pages
-     * - chunks
-     * - metadata
-     * - Book 1
-     * - Book 2
-     */
+    /* ========================================================
+       ADD ANSWER
+    ======================================================== */
 
     function addAnswer(answer) {
 
-        const message = document.createElement("div");
+        const message =
+            document.createElement("div");
 
-        message.className = "message assistant-message";
+        message.className =
+            "message-assistant";
 
-        const card = document.createElement("div");
+        const label =
+            document.createElement("div");
 
-        card.className = "answer-card";
+        label.className =
+            "assistant-label";
 
-        const label = document.createElement("div");
+        label.textContent =
+            "Archive Assistant";
 
-        label.className = "answer-label";
-
-        label.textContent = "ARCHIVE ASSISTANT";
-
-
-        const answerText = document.createElement("div");
-
-        answerText.className = "answer-text";
 
         /*
-         * textContent is intentional.
-         *
-         * It prevents the model response from being interpreted
-         * as HTML and makes sure the COMPLETE answer is displayed.
-         */
+         IMPORTANT:
+         textContent is used here.
 
-        answerText.textContent = answer;
+         This means the frontend displays the COMPLETE
+         answer returned by FastAPI without interpreting
+         HTML or accidentally truncating it.
+        */
 
+        const answerElement =
+            document.createElement("div");
 
-        card.appendChild(label);
+        answerElement.className =
+            "answer";
 
-        card.appendChild(answerText);
-
-        message.appendChild(card);
-
-        messages.appendChild(message);
-
-        scrollToBottom();
-    }
+        answerElement.textContent =
+            answer;
 
 
-    /*
-     * ADD ERROR
-     */
+        message.appendChild(label);
 
-    function addError(text) {
-
-        const message = document.createElement("div");
-
-        message.className = "message assistant-message";
-
-        message.innerHTML = `
-            <div class="error-card">
-                ${escapeHtml(text)}
-            </div>
-        `;
+        message.appendChild(answerElement);
 
         messages.appendChild(message);
 
@@ -789,109 +1017,191 @@
     }
 
 
-    /*
-     * ASK QUESTION
-     */
+    /* ========================================================
+       ADD ERROR
+    ======================================================== */
 
-    async function askQuestion(question) {
+    function addError(messageText) {
 
-        question = question.trim();
+        const error =
+            document.createElement("div");
+
+        error.className =
+            "message-error";
+
+        error.textContent =
+            messageText;
+
+        messages.appendChild(error);
+
+        scrollToBottom();
+    }
+
+
+    /* ========================================================
+       SCROLL
+    ======================================================== */
+
+    function scrollToBottom() {
+
+        setTimeout(() => {
+
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
+
+        }, 50);
+    }
+
+
+    /* ========================================================
+       SUBMIT QUESTION
+    ======================================================== */
+
+    async function submitQuestion(question) {
+
+        question =
+            String(question || "").trim();
 
         if (!question) {
             return;
         }
 
+
+        /*
+         Remove welcome message after first question.
+        */
+
+        if (welcome) {
+            welcome.remove();
+        }
+
+
         addUserMessage(question);
-
-        input.value = "";
-
-        button.disabled = true;
-
-        input.disabled = true;
 
         addLoadingMessage();
 
 
+        input.disabled = true;
+
+        button.disabled = true;
+
+
         try {
 
-            const response = await fetch("/ask", {
+            const response =
+                await fetch("/ask", {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
-                    question: question,
-                    k: 2
-                })
+                    body: JSON.stringify({
 
-            });
+                        question: question,
+
+                        /*
+                         Small k = faster retrieval.
+                        */
+
+                        k: 3
+
+                    })
+
+                });
+
+
+            /*
+             Always try to read JSON.
+            */
+
+            let data = null;
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (jsonError) {
+
+                throw new Error(
+                    "Server returned an invalid response."
+                );
+
+            }
 
 
             removeLoadingMessage();
 
 
             /*
-             * Handle HTTP errors
-             */
+             HTTP error
+            */
 
             if (!response.ok) {
 
-                let errorMessage = "Unable to get an answer.";
+                const detail =
+                    data &&
+                    data.detail
+                        ? data.detail
+                        : "Unable to generate an answer.";
 
-                try {
-
-                    const errorData = await response.json();
-
-                    if (errorData.detail) {
-                        errorMessage = errorData.detail;
-                    }
-
-                } catch (e) {
-                    // Ignore JSON parsing error
-                }
-
-                addError(errorMessage);
+                addError(detail);
 
                 return;
             }
 
 
             /*
-             * Parse JSON
-             */
+             Make sure answer exists.
+            */
 
-            const data = await response.json();
+            if (
+                !data ||
+                typeof data.answer !== "string" ||
+                !data.answer.trim()
+            ) {
+
+                addError(
+                    "No answer was returned."
+                );
+
+                return;
+            }
 
 
             /*
-             * ONLY SHOW THE ACTUAL ANSWER
-             */
+             IMPORTANT:
+             Only data.answer is displayed.
 
-            if (
-                data &&
-                typeof data.answer === "string" &&
+             sources are completely ignored.
+
+             Therefore the UI will NOT show:
+             - Book page
+             - Book 1
+             - Book 2
+             - chunks
+             - retrieved context
+             - FAISS data
+            */
+
+            addAnswer(
                 data.answer.trim()
-            ) {
-
-                addAnswer(data.answer.trim());
-
-            } else {
-
-                addError(
-                    "I couldn't find a relevant answer in the book."
-                );
-
-            }
+            );
 
 
         } catch (error) {
 
-            removeLoadingMessage();
+            console.error(
+                "Request error:",
+                error
+            );
 
-            console.error(error);
+            removeLoadingMessage();
 
             addError(
                 "Unable to connect to the RAG server."
@@ -899,70 +1209,58 @@
 
         } finally {
 
+            input.disabled = false;
+
             button.disabled = false;
 
-            input.disabled = false;
+            input.value = "";
 
             input.focus();
 
         }
-    }
-
-
-    /*
-     * FORM SUBMIT
-     */
-
-    form.addEventListener("submit", function(event) {
-
-        event.preventDefault();
-
-        askQuestion(input.value);
-
-    });
-
-
-    /*
-     * QUICK QUESTIONS
-     */
-
-    function askQuick(question) {
-
-        input.value = question;
-
-        askQuestion(question);
 
     }
 
 
-    /*
-     * ESCAPE HTML
-     */
+    /* ========================================================
+       FORM SUBMIT
+    ======================================================== */
 
-    function escapeHtml(text) {
+    form.addEventListener(
+        "submit",
+        function(event) {
 
-        const div = document.createElement("div");
+            event.preventDefault();
 
-        div.textContent = text;
+            submitQuestion(
+                input.value
+            );
 
-        return div.innerHTML;
+        }
+    );
 
-    }
 
+    /* ========================================================
+       ENTER KEY
+    ======================================================== */
 
-    /*
-     * AUTO SCROLL
-     */
+    input.addEventListener(
+        "keydown",
+        function(event) {
 
-    function scrollToBottom() {
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
 
-        setTimeout(() => {
+                event.preventDefault();
 
-            messages.scrollTop = messages.scrollHeight;
+                form.requestSubmit();
 
-        }, 50);
+            }
 
-    }
+        }
+    );
 
 </script>
 
