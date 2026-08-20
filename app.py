@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -17,7 +18,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 
 # ============================================================
-# CONFIG
+# ENVIRONMENT
 # ============================================================
 
 load_dotenv()
@@ -29,7 +30,7 @@ INDEX_DIR = BASE_DIR / "faiss_index"
 
 app = FastAPI(
     title="Lightning Thief RAG",
-    version="4.0.0"
+    version="2.0.0"
 )
 
 
@@ -37,9 +38,12 @@ app = FastAPI(
 # API KEY
 # ============================================================
 
-if not os.getenv("GOOGLE_API_KEY"):
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+if not GOOGLE_API_KEY:
     raise RuntimeError(
-        "GOOGLE_API_KEY is not set."
+        "GOOGLE_API_KEY is not set. "
+        "Add GOOGLE_API_KEY in Render Environment Variables."
     )
 
 
@@ -47,48 +51,55 @@ if not os.getenv("GOOGLE_API_KEY"):
 # MODELS
 # ============================================================
 
+# Fast and reliable embedding model
 EMBEDDING_MODEL = "models/gemini-embedding-001"
-LLM_MODEL = "gemini-3.6-flash"
+
+# Flash model for faster answers
+LLM_MODEL = "gemini-2.5-flash"
+
 
 embeddings = GoogleGenerativeAIEmbeddings(
-    model=EMBEDDING_MODEL
+    model=EMBEDDING_MODEL,
+    google_api_key=GOOGLE_API_KEY,
 )
+
 
 llm = ChatGoogleGenerativeAI(
     model=LLM_MODEL,
-    temperature=0,
-    max_output_tokens=160
+    temperature=0.1,
+    max_output_tokens=250,
+    google_api_key=GOOGLE_API_KEY,
 )
 
+
+# ============================================================
+# VECTOR STORE
+# ============================================================
 
 vector_store = None
 
 
-# ============================================================
-# BUILD VECTOR STORE
-# ============================================================
-
 def build_vector_store():
+    """
+    Build FAISS index from The Lightning Thief PDF.
+    """
 
     if not PDF_PATH.exists():
         raise FileNotFoundError(
-            f"Book not found: {PDF_PATH}"
+            f"The PDF was not found:\n{PDF_PATH}\n\n"
+            "Make sure The_Lightning_Thief.pdf is in the same "
+            "folder as app.py."
         )
 
-    print("Loading book...")
+    print("Loading Lightning Thief PDF...")
 
-    loader = PyPDFLoader(
-        str(PDF_PATH)
-    )
-
+    loader = PyPDFLoader(str(PDF_PATH))
     documents = loader.load()
 
-    print(
-        f"Loaded {len(documents)} pages."
-    )
+    print(f"Loaded {len(documents)} PDF pages.")
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=900,
+        chunk_size=1000,
         chunk_overlap=100,
         separators=[
             "\n\n",
@@ -96,53 +107,69 @@ def build_vector_store():
             ". ",
             " ",
             ""
-        ]
+        ],
     )
 
-    chunks = splitter.split_documents(
-        documents
-    )
+    chunks = splitter.split_documents(documents)
 
-    print(
-        f"Created {len(chunks)} chunks."
-    )
+    print(f"Created {len(chunks)} chunks.")
+
+    # Store page number internally.
+    # It will NOT be sent to the user.
+    for chunk in chunks:
+        page = chunk.metadata.get("page")
+
+        if page is not None:
+            chunk.metadata["page_number"] = int(page) + 1
+
+    print("Creating FAISS index...")
 
     store = FAISS.from_documents(
         chunks,
         embeddings
     )
 
-    store.save_local(
-        str(INDEX_DIR)
-    )
+    store.save_local(str(INDEX_DIR))
 
-    print("FAISS index created.")
+    print("FAISS index created successfully.")
 
     return store
 
 
-# ============================================================
-# LOAD OR BUILD INDEX
-# ============================================================
-
 def load_or_build_store():
+    """
+    Load existing FAISS index.
+    If it doesn't exist, build a new one.
+    """
 
     index_file = INDEX_DIR / "index.faiss"
 
-    if (
-        INDEX_DIR.exists()
-        and index_file.exists()
-    ):
+    if index_file.exists():
 
         print("Loading existing FAISS index...")
 
-        return FAISS.load_local(
-            str(INDEX_DIR),
-            embeddings,
-            allow_dangerous_deserialization=True
-        )
+        try:
+            store = FAISS.load_local(
+                str(INDEX_DIR),
+                embeddings,
+                allow_dangerous_deserialization=True,
+            )
 
-    print("Building FAISS index...")
+            print("FAISS index loaded.")
+
+            return store
+
+        except Exception as e:
+
+            print(
+                "Existing FAISS index could not be loaded."
+            )
+
+            print(str(e))
+
+            print("Building a fresh index...")
+
+            return build_vector_store()
 
     return build_vector_store()
 
@@ -152,107 +179,81 @@ def load_or_build_store():
 # ============================================================
 
 @app.on_event("startup")
-def startup():
+def startup_event():
 
     global vector_store
 
+    print("----------------------------------------")
+    print("Starting Lightning Thief RAG...")
+    print("----------------------------------------")
+
     vector_store = load_or_build_store()
 
-    print("===================================")
-    print("LIGHTNING THIEF RAG ONLINE")
-    print("===================================")
+    print("----------------------------------------")
+    print("Lightning Thief RAG is ready.")
+    print("----------------------------------------")
 
 
 # ============================================================
-# REQUEST MODEL
+# REQUEST / RESPONSE MODELS
 # ============================================================
 
 class AskRequest(BaseModel):
-
     question: str
+    k: int = 3
 
 
-# ============================================================
-# RESPONSE MODEL
-# ============================================================
+class SourceItem(BaseModel):
+    page: int | None = None
+    text: str
+
 
 class AskResponse(BaseModel):
-
     answer: str
+    sources: List[SourceItem] = []
 
 
 # ============================================================
-# STRICT RAG PROMPT
+# PROMPT
 # ============================================================
 
 PROMPT = ChatPromptTemplate.from_template(
     """
-You are a book question-answering assistant.
+You are the question-answering assistant for
+Rick Riordan's "The Lightning Thief".
 
-The only book you are allowed to answer questions about is:
+Your ONLY job is to answer the user's question.
 
-"The Lightning Thief" by Rick Riordan.
+IMPORTANT RULES:
 
-You have been given relevant passages from the book.
+1. Use ONLY the provided book context.
+2. Do NOT use outside knowledge.
+3. Do NOT guess.
+4. Do NOT invent information.
+5. Answer ONLY what the user asked.
+6. Keep the answer short and direct.
+7. Normally answer in 1 to 3 sentences.
+8. Do not repeat the question.
+9. Do not mention "retrieved context".
+10. Do not mention "chunks".
+11. Do not mention "FAISS".
+12. Do not mention pages.
+13. Do not mention the RAG system.
+14. Do not explain these instructions.
+15. Do not output headings such as "Answer:".
+16. Do not output bullet points unless the question specifically asks for a list.
+17. Do not provide unrelated information.
 
-BOOK PASSAGES:
+If the answer cannot be found in the provided book context,
+respond with exactly:
+
+I don't know based on the book.
+
+BOOK CONTEXT:
 {context}
 
 USER QUESTION:
 {question}
-
-Follow these rules:
-
-1. Answer the user's question directly.
-2. Use ONLY the information contained in the book passages.
-3. Never use outside knowledge.
-4. Never guess.
-5. Never invent facts.
-6. Never discuss anything unrelated to the question.
-7. Never repeat the book passages.
-8. Never explain your reasoning.
-9. Never mention RAG, AI, FAISS, embeddings, retrieval,
-   passages, context, or sources.
-10. Do not provide page numbers.
-11. Do not provide a list of sources.
-12. Do not say "according to the context".
-13. Give a natural human answer.
-14. Give enough information to actually answer the question.
-15. Do NOT answer with only a person's name unless the
-    question specifically asks for just a name.
-16. Normally answer in 1-3 sentences.
-17. If the question cannot be answered from the provided
-    book passages, say exactly:
-
-I don't know based on the provided book.
-
-Examples:
-
-Question:
-Who is Percy Jackson?
-
-Good answer:
-Percy Jackson is the twelve-year-old protagonist of
-The Lightning Thief and the son of Poseidon.
-
-Question:
-Who is Percy's father?
-
-Good answer:
-Percy's father is Poseidon.
-
-Question:
-Why is the master bolt important?
-
-Good answer:
-The master bolt is important because its theft threatens
-to cause a war among the Greek gods.
-
-Question:
-Tell me about Harry Potter.
-
-Good answer:
-I don't know based on the provided book.
 
 FINAL ANSWER:
 """
@@ -260,13 +261,24 @@ FINAL ANSWER:
 
 
 # ============================================================
-# EXTRACT GEMINI RESPONSE
+# EXTRACT GEMINI TEXT
 # ============================================================
 
-def extract_text(content):
+def extract_text(content) -> str:
+    """
+    Gemini may return content as either:
 
-    if content is None:
-        return ""
+        "normal string"
+
+    or:
+
+        [
+            {"type": "text", "text": "..."}
+        ]
+
+    This function safely converts either format
+    into a normal Python string.
+    """
 
     if isinstance(content, str):
         return content.strip()
@@ -277,30 +289,15 @@ def extract_text(content):
 
         for item in content:
 
-            if isinstance(item, dict):
+            if isinstance(item, str):
+                parts.append(item)
+
+            elif isinstance(item, dict):
 
                 text = item.get("text")
 
                 if text:
-                    parts.append(
-                        str(text)
-                    )
-
-            elif hasattr(item, "text"):
-
-                text = getattr(
-                    item,
-                    "text"
-                )
-
-                if text:
-                    parts.append(
-                        str(text)
-                    )
-
-            elif isinstance(item, str):
-
-                parts.append(item)
+                    parts.append(str(text))
 
         return " ".join(parts).strip()
 
@@ -311,31 +308,48 @@ def extract_text(content):
 # CLEAN ANSWER
 # ============================================================
 
-def clean_answer(answer):
+def clean_answer(answer: str) -> str:
+    """
+    Remove accidental model formatting or instruction leakage.
+    """
+
+    if not answer:
+        return "I don't know based on the book."
 
     answer = answer.strip()
 
+    # Remove common unwanted prefixes
     prefixes = [
         "FINAL ANSWER:",
         "Final Answer:",
         "ANSWER:",
-        "Answer:"
+        "Answer:",
     ]
 
     for prefix in prefixes:
 
         if answer.startswith(prefix):
+            answer = answer[len(prefix):].strip()
 
-            answer = answer[
-                len(prefix):
-            ].strip()
+    # Remove accidental instruction leakage
+    unwanted_phrases = [
+        "No outside knowledge, guesses, invented",
+        "No outside knowledge",
+        "Use only the provided context",
+        "Use ONLY the provided book context",
+        "BOOK CONTEXT:",
+        "USER QUESTION:",
+    ]
 
-    answer = answer.replace(
-        "```",
-        ""
-    ).strip()
+    for phrase in unwanted_phrases:
 
-    return answer
+        if phrase.lower() in answer.lower():
+
+            # If the model returned prompt text instead
+            # of an answer, don't show that to the user.
+            return "I don't know based on the book."
+
+    return answer.strip()
 
 
 # ============================================================
@@ -354,13 +368,11 @@ def home():
             detail="index.html is missing."
         )
 
-    return FileResponse(
-        index_file
-    )
+    return FileResponse(index_file)
 
 
 # ============================================================
-# HEALTH
+# HEALTH CHECK
 # ============================================================
 
 @app.get("/health")
@@ -369,23 +381,27 @@ def health():
     return {
         "status": "ok",
         "book": PDF_PATH.name,
-        "vector_index": INDEX_DIR.exists()
+        "vector_index": (
+            INDEX_DIR.exists()
+            and (INDEX_DIR / "index.faiss").exists()
+        ),
     }
 
 
 # ============================================================
-# ASK
+# ASK QUESTION
 # ============================================================
 
-@app.post(
-    "/ask",
-    response_model=AskResponse
-)
+@app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest):
 
     global vector_store
 
     question = request.question.strip()
+
+    # --------------------------------------------------------
+    # Validate question
+    # --------------------------------------------------------
 
     if not question:
 
@@ -395,7 +411,7 @@ def ask(request: AskRequest):
         )
 
     # --------------------------------------------------------
-    # Load FAISS
+    # Make sure vector store exists
     # --------------------------------------------------------
 
     if vector_store is None:
@@ -403,43 +419,71 @@ def ask(request: AskRequest):
         vector_store = load_or_build_store()
 
     # --------------------------------------------------------
-    # Retrieve only 2 relevant chunks
+    # Retrieve only a small number of relevant chunks
     # --------------------------------------------------------
+
+    k = max(
+        1,
+        min(request.k, 3)
+    )
 
     try:
 
         docs = vector_store.similarity_search(
             question,
-            k=2
+            k=k
         )
 
     except Exception as e:
 
-        print(
-            f"FAISS ERROR: {e}"
-        )
+        print("Retrieval error:", str(e))
 
         raise HTTPException(
             status_code=500,
-            detail="Book search failed."
+            detail="Unable to search the book."
         )
+
+    # --------------------------------------------------------
+    # No relevant content
+    # --------------------------------------------------------
 
     if not docs:
 
         return AskResponse(
-            answer=(
-                "I don't know based on "
-                "the provided book."
-            )
+            answer="I don't know based on the book.",
+            sources=[]
         )
 
     # --------------------------------------------------------
-    # Create context
+    # Build clean context
     # --------------------------------------------------------
 
-    context = "\n\n".join(
-        doc.page_content.strip()
-        for doc in docs
+    context_parts = []
+
+    for doc in docs:
+
+        text = doc.page_content.strip()
+
+        if text:
+
+            context_parts.append(text)
+
+    if not context_parts:
+
+        return AskResponse(
+            answer="I don't know based on the book.",
+            sources=[]
+        )
+
+    context = "\n\n".join(context_parts)
+
+    # --------------------------------------------------------
+    # Create prompt
+    # --------------------------------------------------------
+
+    prompt = PROMPT.format_messages(
+        context=context,
+        question=question
     )
 
     # --------------------------------------------------------
@@ -448,53 +492,45 @@ def ask(request: AskRequest):
 
     try:
 
-        prompt = PROMPT.format_messages(
-            context=context,
-            question=question
-        )
-
         result = llm.invoke(prompt)
-
-        answer = extract_text(
-            result.content
-        )
-
-        answer = clean_answer(
-            answer
-        )
 
     except Exception as e:
 
-        print(
-            f"GEMINI ERROR: {e}"
-        )
+        print("Gemini error:", str(e))
 
         raise HTTPException(
             status_code=500,
-            detail="Failed to generate answer."
-        )
-
-    # --------------------------------------------------------
-    # Safety fallback
-    # --------------------------------------------------------
-
-    if not answer:
-
-        answer = (
-            "I don't know based on "
-            "the provided book."
+            detail="Unable to generate an answer."
         )
 
     # --------------------------------------------------------
     # IMPORTANT:
-    # Return ONLY the answer.
-    # No pages.
-    # No sources.
-    # No book1/book2.
+    # Gemini content can be a LIST.
+    # Convert it to a normal string.
+    # --------------------------------------------------------
+
+    answer = extract_text(
+        result.content
+    )
+
+    # --------------------------------------------------------
+    # Clean answer
+    # --------------------------------------------------------
+
+    answer = clean_answer(
+        answer
+    )
+
+    # --------------------------------------------------------
+    # Return ONLY answer to frontend.
+    #
+    # sources are intentionally empty so the UI does not
+    # display Book 1 / Book 2 / page information.
     # --------------------------------------------------------
 
     return AskResponse(
-        answer=answer
+        answer=answer,
+        sources=[]
     )
 
 
@@ -513,12 +549,14 @@ def rebuild_index():
 
         return {
             "status": "rebuilt",
-            "message": "FAISS index rebuilt successfully."
+            "message": "Lightning Thief FAISS index rebuilt successfully."
         }
 
     except Exception as e:
 
+        print("Rebuild error:", str(e))
+
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail="Unable to rebuild the index."
         )
