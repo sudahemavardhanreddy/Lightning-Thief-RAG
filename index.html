@@ -2,16 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Lightning Thief Archives</title>
+    <title>Lightning Thief Assistant</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -22,48 +17,29 @@
 
         body {
             margin: 0;
-            min-height: 100vh;
-
             background:
-                radial-gradient(
-                    circle at 15% 10%,
-                    rgba(214, 151, 48, 0.08),
-                    transparent 28%
-                ),
+                radial-gradient(circle at 15% 10%, rgba(230, 162, 54, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 80%, rgba(35, 92, 130, 0.10), transparent 30%),
                 #080d15;
-
-            color: #f4f5f7;
-
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
+            color: #f4f7fb;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            min-height: 100vh;
         }
-
-        /* =====================================================
-           MAIN PAGE
-        ===================================================== */
 
         .page {
-            width: min(1180px, 92%);
+            width: min(1200px, 94%);
             margin: 0 auto;
-            padding: 42px 0 35px;
+            padding: 45px 0 30px;
         }
 
-        /* =====================================================
-           HEADER
-        ===================================================== */
+        /* ================= HEADER ================= */
 
-        .header {
+        .top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-
-            padding-bottom: 28px;
-
-            border-bottom: 1px solid #202834;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #202b38;
         }
 
         .brand {
@@ -72,45 +48,28 @@
             gap: 14px;
         }
 
-        .logo {
-            width: 44px;
-            height: 44px;
-
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #e8ad43,
-                    #b97819
-                );
-
+            background: linear-gradient(135deg, #f0b33f, #b97517);
             color: #10151d;
-
-            font-size: 25px;
+            font-size: 23px;
             font-weight: 900;
-
-            box-shadow:
-                0 8px 25px rgba(225, 163, 58, 0.18);
+            box-shadow: 0 8px 25px rgba(240, 179, 63, 0.18);
         }
 
-        .brand-text h2 {
-            margin: 0;
-
+        .brand-name {
             font-size: 17px;
-            font-weight: 750;
-            letter-spacing: -0.3px;
+            font-weight: 800;
         }
 
-        .brand-text p {
-            margin: 3px 0 0;
-
-            color: #8290a4;
-
+        .brand-subtitle {
+            margin-top: 4px;
+            color: #7f94ac;
             font-size: 13px;
         }
 
@@ -118,440 +77,249 @@
             display: flex;
             align-items: center;
             gap: 8px;
-
-            padding: 9px 14px;
-
-            border: 1px solid #273443;
+            padding: 9px 15px;
+            border: 1px solid #263d43;
             border-radius: 999px;
-
-            color: #77e5ae;
-
-            background: rgba(18, 29, 42, 0.75);
-
+            color: #7ff0b4;
+            background: rgba(20, 37, 40, 0.5);
             font-size: 13px;
         }
 
         .status-dot {
             width: 7px;
             height: 7px;
-
             border-radius: 50%;
-
-            background: #58e99e;
-
-            box-shadow:
-                0 0 10px rgba(88, 233, 158, 0.7);
+            background: #4be58d;
+            box-shadow: 0 0 10px #4be58d;
         }
 
-        /* =====================================================
-           HERO
-        ===================================================== */
+        /* ================= HERO ================= */
 
         .hero {
-            padding: 52px 0 30px;
+            padding: 55px 0 35px;
         }
 
         .eyebrow {
-            margin-bottom: 13px;
-
-            color: #e7a637;
-
+            color: #e7a52e;
             font-size: 12px;
-            font-weight: 750;
-
             letter-spacing: 2px;
-            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 14px;
         }
 
         .hero h1 {
-            max-width: 850px;
-
             margin: 0;
-
-            font-size: clamp(42px, 6vw, 72px);
-
+            max-width: 820px;
+            font-size: clamp(42px, 6vw, 76px);
             line-height: 0.98;
-
             letter-spacing: -3px;
-
-            font-weight: 850;
+            font-weight: 900;
         }
 
         .hero h1 span {
-            color: #e7a637;
+            color: #e7a52e;
         }
 
         .hero p {
-            max-width: 720px;
-
             margin: 22px 0 0;
-
-            color: #8e9db2;
-
+            max-width: 700px;
+            color: #8da1b9;
             font-size: 15px;
             line-height: 1.7;
         }
 
-        /* =====================================================
-           SUGGESTIONS
-        ===================================================== */
+        /* ================= QUICK QUESTIONS ================= */
 
-        .try-label {
-            margin: 8px 0 11px;
-
-            color: #718097;
-
+        .quick-title {
+            color: #7d91a8;
             font-size: 11px;
-            letter-spacing: 1.5px;
-
-            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
         }
 
-        .suggestions {
+        .quick-questions {
             display: flex;
             flex-wrap: wrap;
             gap: 9px;
+            margin-bottom: 32px;
         }
 
-        .suggestion {
-            padding: 10px 14px;
-
+        .quick-btn {
             border: 1px solid #2a3543;
+            background: #101720;
+            color: #c9d5e2;
+            padding: 10px 15px;
             border-radius: 9px;
-
-            background: #10161f;
-
-            color: #b9c5d4;
-
-            font-size: 13px;
-
             cursor: pointer;
-
-            transition:
-                border-color 0.18s ease,
-                background 0.18s ease,
-                transform 0.18s ease;
+            font-size: 13px;
+            transition: 0.2s ease;
         }
 
-        .suggestion:hover {
-            border-color: #b77c25;
-            background: #151c26;
-
+        .quick-btn:hover {
+            border-color: #c68b2b;
+            color: #ffffff;
+            background: #151d27;
             transform: translateY(-1px);
         }
 
-        /* =====================================================
-           CHAT PANEL
-        ===================================================== */
+        /* ================= CHAT ================= */
 
-        .chat {
-            margin-top: 52px;
-
-            border: 1px solid #26303c;
-            border-radius: 20px;
-
-            background: rgba(10, 15, 23, 0.9);
-
+        .chat-container {
+            border: 1px solid #26313e;
+            border-radius: 18px;
             overflow: hidden;
-
-            box-shadow:
-                0 25px 80px rgba(0, 0, 0, 0.22);
+            background: rgba(9, 14, 22, 0.88);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
         }
 
         .chat-header {
             height: 62px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 0 20px;
-
-            border-bottom: 1px solid #202934;
+            border-bottom: 1px solid #202b37;
         }
 
         .assistant-name {
             display: flex;
             align-items: center;
             gap: 10px;
-
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .assistant-icon {
             width: 30px;
             height: 30px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
             border-radius: 8px;
-
-            background: #26211a;
-
-            color: #e4a336;
-
-            font-size: 16px;
+            background: #29251e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e9a631;
         }
 
-        .chat-label {
-            color: #738198;
-
+        .header-note {
+            color: #6f8299;
             font-size: 12px;
         }
 
-        /* =====================================================
-           MESSAGES
-        ===================================================== */
+        /* IMPORTANT:
+           No fixed height.
+           No overflow hidden.
+           No line clamp.
+           Answers can grow naturally.
+        */
 
         .messages {
-            padding: 26px;
-
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-
-            /*
-              IMPORTANT:
-              No fixed height.
-              No overflow:hidden.
-              This allows the answer to grow normally.
-            */
+            padding: 28px 26px;
+            min-height: 220px;
         }
 
         .welcome {
-            padding: 30px;
-
-            border: 1px solid #252f3a;
-            border-radius: 14px;
-
-            background: #101721;
-
-            color: #9ba9bb;
-
-            text-align: center;
-
+            padding: 25px;
+            border: 1px solid #202c39;
+            border-radius: 15px;
+            background: #0e151e;
+            color: #aab9c9;
             line-height: 1.7;
-
-            font-size: 14px;
+            text-align: center;
         }
 
-        .welcome strong {
-            color: #f0f2f5;
+        .message {
+            margin-bottom: 25px;
+            width: 100%;
         }
 
-        /* USER MESSAGE */
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+        }
 
-        .message-user {
-            align-self: flex-end;
-
+        .user-bubble {
             max-width: 72%;
-
-            padding: 13px 17px;
-
-            border: 1px solid #294d68;
+            padding: 14px 18px;
             border-radius: 14px 14px 4px 14px;
-
-            background: #102b3f;
-
-            color: #edf4fa;
-
+            background: #14324a;
+            border: 1px solid #24516f;
+            color: #f4f8fc;
             font-size: 14px;
+            line-height: 1.5;
 
-            line-height: 1.55;
-
-            word-break: break-word;
-        }
-
-        /* ASSISTANT MESSAGE */
-
-        .message-assistant {
-            width: 100%;
-
-            padding: 24px;
-
-            border: 1px solid #28323e;
-
-            border-radius: 14px;
-
-            background: #101821;
-        }
-
-        .assistant-label {
-            margin-bottom: 14px;
-
-            color: #e5a335;
-
-            font-size: 10px;
-            font-weight: 800;
-
-            letter-spacing: 1.7px;
-
-            text-transform: uppercase;
-        }
-
-        /*
-          IMPORTANT FIX:
-          The answer is allowed to use its natural height.
-          No max-height.
-          No fixed height.
-          No overflow:hidden.
-        */
-
-        .answer {
-            width: 100%;
-
-            color: #e8edf3;
-
-            font-size: 15px;
-
-            line-height: 1.75;
-
+            /* IMPORTANT */
             white-space: pre-wrap;
-
             overflow-wrap: anywhere;
-
             word-break: normal;
         }
 
-        /* ERROR */
-
-        .message-error {
-            padding: 16px 18px;
-
-            border: 1px solid #71343b;
-            border-radius: 12px;
-
-            background: #211419;
-
-            color: #ff9da5;
-
-            font-size: 14px;
-
-            line-height: 1.5;
+        .assistant-message {
+            display: block;
         }
 
-        /* =====================================================
-           INPUT AREA
-        ===================================================== */
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-
-            padding: 14px;
-
-            border-top: 1px solid #202934;
-
-            background: #0a1018;
+        .answer-card {
+            width: 100%;
+            border: 1px solid #263442;
+            border-radius: 15px;
+            background: #101821;
+            padding: 24px;
         }
 
-        #question {
-            flex: 1;
-
-            min-width: 0;
-
-            height: 52px;
-
-            padding: 0 17px;
-
-            border: 1px solid #6f4c19;
-            border-radius: 12px;
-
-            outline: none;
-
-            background: #0c131d;
-
-            color: #edf2f7;
-
-            font-size: 14px;
-
-            transition:
-                border-color 0.18s ease,
-                box-shadow 0.18s ease;
+        .answer-label {
+            color: #e8a32d;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
         }
 
-        #question::placeholder {
-            color: #637288;
+        .answer-text {
+            color: #e8eef5;
+            font-size: 15px;
+            line-height: 1.75;
+
+            /* CRITICAL FIX */
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: normal;
+
+            /* NEVER CUT THE ANSWER */
+            height: auto;
+            max-height: none;
+            overflow: visible;
+
+            display: block;
         }
 
-        #question:focus {
-            border-color: #d39a38;
-
-            box-shadow:
-                0 0 0 3px rgba(211, 154, 56, 0.08);
+        .answer-text p {
+            margin: 0 0 12px;
         }
 
-        #askButton {
-            width: 54px;
-            height: 52px;
-
-            border: none;
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #edb44d,
-                    #c98522
-                );
-
-            color: #10151c;
-
-            font-size: 22px;
-            font-weight: 800;
-
-            cursor: pointer;
-
-            transition:
-                transform 0.18s ease,
-                opacity 0.18s ease;
+        .answer-text p:last-child {
+            margin-bottom: 0;
         }
 
-        #askButton:hover {
-            transform: translateY(-1px);
-        }
-
-        #askButton:disabled {
-            opacity: 0.45;
-
-            cursor: not-allowed;
-
-            transform: none;
-        }
-
-        /* =====================================================
-           LOADING
-        ===================================================== */
+        /* ================= LOADING ================= */
 
         .loading {
-            display: inline-flex;
-
+            display: flex;
             align-items: center;
-
-            gap: 8px;
-
-            color: #9ba8b9;
-
-            font-size: 14px;
+            gap: 10px;
+            color: #8fa3b8;
+            font-size: 13px;
         }
 
         .loading-dots {
-            display: inline-flex;
+            display: flex;
             gap: 4px;
         }
 
         .loading-dots span {
-            width: 5px;
-            height: 5px;
-
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-
-            background: #dca03c;
-
-            animation: pulse 1s infinite;
+            background: #e5a12c;
+            animation: bounce 0.8s infinite alternate;
         }
 
         .loading-dots span:nth-child(2) {
@@ -562,38 +330,98 @@
             animation-delay: 0.3s;
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.25;
+        @keyframes bounce {
+            from {
+                opacity: 0.3;
                 transform: translateY(0);
             }
 
-            50% {
+            to {
                 opacity: 1;
-                transform: translateY(-2px);
+                transform: translateY(-4px);
             }
         }
 
-        /* =====================================================
-           FOOTER
-        ===================================================== */
+        /* ================= ERROR ================= */
+
+        .error-card {
+            border: 1px solid #63343a;
+            background: #211318;
+            color: #ff9e9e;
+            border-radius: 13px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* ================= INPUT ================= */
+
+        .input-area {
+            padding: 15px;
+            border-top: 1px solid #202b37;
+            background: #090f17;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #8e641f;
+            border-radius: 13px;
+            padding: 5px 6px 5px 15px;
+            background: #0c131c;
+        }
+
+        #questionInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #ffffff;
+            font-size: 14px;
+            min-width: 0;
+            padding: 11px 0;
+        }
+
+        #questionInput::placeholder {
+            color: #62758c;
+        }
+
+        #askButton {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #efb143, #d58c20);
+            color: #17120b;
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        #askButton:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+
+        #askButton:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ================= FOOTER ================= */
 
         .footer {
             display: flex;
             justify-content: space-between;
-
-            margin-top: 18px;
-
-            color: #536176;
-
+            padding-top: 18px;
+            color: #53667c;
             font-size: 11px;
         }
 
-        /* =====================================================
-           MOBILE
-        ===================================================== */
+        /* ================= MOBILE ================= */
 
         @media (max-width: 700px) {
 
@@ -602,7 +430,7 @@
                 padding-top: 25px;
             }
 
-            .header {
+            .top-bar {
                 align-items: flex-start;
             }
 
@@ -611,40 +439,36 @@
             }
 
             .hero {
-                padding-top: 38px;
+                padding: 40px 0 25px;
             }
 
             .hero h1 {
-                font-size: 44px;
-
+                font-size: 46px;
                 letter-spacing: -2px;
             }
 
-            .chat {
-                margin-top: 35px;
-            }
-
             .messages {
-                padding: 17px;
+                padding: 20px 15px;
             }
 
-            .message-user {
+            .user-bubble {
                 max-width: 88%;
             }
 
-            .input-area {
-                padding: 10px;
+            .answer-card {
+                padding: 19px;
             }
 
-            #askButton {
-                width: 50px;
+            .answer-text {
+                font-size: 14px;
+                line-height: 1.7;
             }
 
             .footer {
-                padding-bottom: 15px;
+                gap: 10px;
+                flex-direction: column;
             }
         }
-
     </style>
 </head>
 
@@ -652,51 +476,36 @@
 
 <div class="page">
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
-    <header class="header">
+    <!-- HEADER -->
+    <header class="top-bar">
 
         <div class="brand">
+            <div class="brand-icon">⚡</div>
 
-            <div class="logo">
-                ⚡
-            </div>
+            <div>
+                <div class="brand-name">
+                    Lightning Thief Assistant
+                </div>
 
-            <div class="brand-text">
-
-                <h2>
-                    Lightning Thief Archives
-                </h2>
-
-                <p>
+                <div class="brand-subtitle">
                     Ask questions. Search the story.
-                </p>
-
+                </div>
             </div>
-
         </div>
 
         <div class="status">
-
             <span class="status-dot"></span>
-
             RAG Online
-
         </div>
 
     </header>
 
 
-    <!-- =====================================================
-         HERO
-    ====================================================== -->
-
+    <!-- HERO -->
     <section class="hero">
 
         <div class="eyebrow">
-            Camp Half-Blood Knowledge Base
+            CAMP HALF-BLOOD KNOWLEDGE BASE
         </div>
 
         <h1>
@@ -712,138 +521,90 @@
     </section>
 
 
-    <!-- =====================================================
-         SUGGESTIONS
-    ====================================================== -->
-
-    <div class="try-label">
-        Try a question
+    <!-- QUICK QUESTIONS -->
+    <div class="quick-title">
+        TRY A QUESTION
     </div>
 
-    <div class="suggestions">
+    <div class="quick-questions">
 
-        <button
-            class="suggestion"
-            onclick="askSuggestion('Who is Percy Jackson?')"
-        >
+        <button class="quick-btn"
+                onclick="askQuick('Who is Percy Jackson?')">
             Who is Percy Jackson?
         </button>
 
-        <button
-            class="suggestion"
-            onclick="askSuggestion('Why is the master bolt important?')"
-        >
+        <button class="quick-btn"
+                onclick="askQuick('Why is the master bolt important?')">
             Why is the master bolt important?
         </button>
 
-        <button
-            class="suggestion"
-            onclick="askSuggestion('Who betrays Percy?')"
-        >
+        <button class="quick-btn"
+                onclick="askQuick('Who betrays Percy?')">
             Who betrays Percy?
         </button>
 
-        <button
-            class="suggestion"
-            onclick="askSuggestion('What happens at the Lotus Casino?')"
-        >
+        <button class="quick-btn"
+                onclick="askQuick('What happens at the Lotus Casino?')">
             What happens at the Lotus Casino?
         </button>
 
     </div>
 
 
-    <!-- =====================================================
-         CHAT
-    ====================================================== -->
-
-    <section class="chat">
+    <!-- CHAT -->
+    <section class="chat-container">
 
         <div class="chat-header">
 
             <div class="assistant-name">
-
-                <div class="assistant-icon">
-                    ⚡
-                </div>
-
+                <div class="assistant-icon">⚡</div>
                 Lightning Thief Assistant
-
             </div>
 
-            <div class="chat-label">
+            <div class="header-note">
                 Answers from the book
             </div>
 
         </div>
 
 
-        <!-- =================================================
-             MESSAGES
-        ================================================== -->
+        <!-- MESSAGES -->
+        <div id="messages" class="messages">
 
-        <div
-            id="messages"
-            class="messages"
-        >
-
-            <div
-                id="welcome"
-                class="welcome"
-            >
-                <strong>
-                    Ask me a question about The Lightning Thief.
-                </strong>
-                <br>
-                I'll answer using the book.
+            <div class="welcome">
+                Ask me a question about <strong>The Lightning Thief.</strong>
             </div>
 
         </div>
 
 
-        <!-- =================================================
-             INPUT
-        ================================================== -->
+        <!-- INPUT -->
+        <div class="input-area">
 
-        <form
-            id="askForm"
-            class="input-area"
-        >
+            <div class="input-wrapper">
 
-            <input
-                id="question"
-                type="text"
-                autocomplete="off"
-                placeholder="Ask something about The Lightning Thief..."
-            >
+                <input
+                    id="questionInput"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Ask something about The Lightning Thief..."
+                >
 
-            <button
-                id="askButton"
-                type="submit"
-                aria-label="Ask"
-            >
-                ↑
-            </button>
+                <button id="askButton" onclick="askQuestion()">
+                    ↑
+                </button>
 
-        </form>
+            </div>
+
+        </div>
 
     </section>
 
 
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
+    <!-- FOOTER -->
     <footer class="footer">
-
-        <span>
-            Lightning Thief Archives
-        </span>
-
-        <span>
-            Powered by Gemini + FAISS
-        </span>
-
+        <span>Lightning Thief Archives</span>
+        <span>Powered by Gemini + FAISS</span>
     </footer>
 
 </div>
@@ -851,369 +612,379 @@
 
 <script>
 
-    /* ========================================================
-       ELEMENTS
-    ======================================================== */
-
-    const form =
-        document.getElementById("askForm");
-
-    const input =
-        document.getElementById("question");
-
-    const button =
-        document.getElementById("askButton");
-
-    const messages =
-        document.getElementById("messages");
-
-    const welcome =
-        document.getElementById("welcome");
+    const input = document.getElementById("questionInput");
+    const askButton = document.getElementById("askButton");
+    const messages = document.getElementById("messages");
 
 
-    /* ========================================================
-       ASK SUGGESTION
-    ======================================================== */
+    /* =========================================================
+       ASK QUICK QUESTION
+    ========================================================= */
 
-    function askSuggestion(question) {
+    function askQuick(question) {
 
         input.value = question;
+        askQuestion();
 
-        input.focus();
-
-        submitQuestion(question);
     }
 
 
-    /* ========================================================
+    /* =========================================================
+       ESCAPE HTML
+       Prevents answer text from being interpreted as HTML.
+    ========================================================= */
+
+    function escapeHTML(text) {
+
+        const div = document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================================================
        ADD USER MESSAGE
-    ======================================================== */
+    ========================================================= */
 
     function addUserMessage(question) {
 
-        const message =
-            document.createElement("div");
+        const wrapper = document.createElement("div");
 
-        message.className =
-            "message-user";
+        wrapper.className = "message user-message";
 
-        message.textContent =
-            question;
+        wrapper.innerHTML = `
+            <div class="user-bubble">
+                ${escapeHTML(question)}
+            </div>
+        `;
 
-        messages.appendChild(message);
+        messages.appendChild(wrapper);
 
         scrollToBottom();
+
     }
 
 
-    /* ========================================================
+    /* =========================================================
        ADD LOADING MESSAGE
-    ======================================================== */
+    ========================================================= */
 
     function addLoadingMessage() {
 
-        const message =
-            document.createElement("div");
+        const wrapper = document.createElement("div");
 
-        message.className =
-            "message-assistant";
+        wrapper.className = "message assistant-message";
 
-        message.id =
-            "currentLoading";
+        wrapper.id = "loadingMessage";
 
-        message.innerHTML = `
+        wrapper.innerHTML = `
+            <div class="answer-card">
 
-            <div class="assistant-label">
-                Archive Assistant
-            </div>
+                <div class="answer-label">
+                    ARCHIVE ASSISTANT
+                </div>
 
-            <div class="loading">
+                <div class="loading">
 
-                Finding the answer
+                    <span>Thinking</span>
 
-                <span class="loading-dots">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
-                    <span></span>
-                    <span></span>
-                    <span></span>
-
-                </span>
+                </div>
 
             </div>
-
         `;
 
-        messages.appendChild(message);
+        messages.appendChild(wrapper);
 
         scrollToBottom();
+
     }
 
 
-    /* ========================================================
+    /* =========================================================
        REMOVE LOADING
-    ======================================================== */
+    ========================================================= */
 
     function removeLoadingMessage() {
 
-        const loading =
-            document.getElementById(
-                "currentLoading"
-            );
+        const loading = document.getElementById("loadingMessage");
 
         if (loading) {
             loading.remove();
         }
+
     }
 
 
-    /* ========================================================
+    /* =========================================================
        ADD ANSWER
-    ======================================================== */
+    ========================================================= */
 
     function addAnswer(answer) {
 
-        const message =
-            document.createElement("div");
+        removeLoadingMessage();
 
-        message.className =
-            "message-assistant";
+        const wrapper = document.createElement("div");
 
-        const label =
-            document.createElement("div");
-
-        label.className =
-            "assistant-label";
-
-        label.textContent =
-            "Archive Assistant";
-
+        wrapper.className = "message assistant-message";
 
         /*
          IMPORTANT:
-         textContent is used here.
+         We intentionally display ONLY the answer.
 
-         This means the frontend displays the COMPLETE
-         answer returned by FastAPI without interpreting
-         HTML or accidentally truncating it.
+         No:
+         - Book 1
+         - Book 2
+         - Page
+         - Sources
+         - Metadata
+         - Retrieved chunks
+         */
+
+        wrapper.innerHTML = `
+            <div class="answer-card">
+
+                <div class="answer-label">
+                    ARCHIVE ASSISTANT
+                </div>
+
+                <div class="answer-text"></div>
+
+            </div>
+        `;
+
+        const answerText = wrapper.querySelector(".answer-text");
+
+        /*
+         textContent is intentional.
+         It keeps the complete answer as plain text.
         */
+        answerText.textContent = answer;
 
-        const answerElement =
-            document.createElement("div");
-
-        answerElement.className =
-            "answer";
-
-        answerElement.textContent =
-            answer;
-
-
-        message.appendChild(label);
-
-        message.appendChild(answerElement);
-
-        messages.appendChild(message);
+        messages.appendChild(wrapper);
 
         scrollToBottom();
+
     }
 
 
-    /* ========================================================
+    /* =========================================================
        ADD ERROR
-    ======================================================== */
+    ========================================================= */
 
-    function addError(messageText) {
+    function addError(message) {
 
-        const error =
-            document.createElement("div");
+        removeLoadingMessage();
 
-        error.className =
-            "message-error";
+        const wrapper = document.createElement("div");
 
-        error.textContent =
-            messageText;
+        wrapper.className = "message assistant-message";
 
-        messages.appendChild(error);
+        wrapper.innerHTML = `
+            <div class="error-card">
+                ${escapeHTML(message)}
+            </div>
+        `;
+
+        messages.appendChild(wrapper);
 
         scrollToBottom();
+
     }
 
 
-    /* ========================================================
-       SCROLL
-    ======================================================== */
+    /* =========================================================
+       EXTRACT ANSWER FROM FASTAPI RESPONSE
+       
+       Supports:
+       {
+           "answer": "..."
+       }
 
-    function scrollToBottom() {
+       or:
+       {
+           "response": "..."
+       }
 
-        setTimeout(() => {
+       or:
+       {
+           "result": "..."
+       }
 
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth"
-            });
+       or:
+       {
+           "message": "..."
+       }
+    ========================================================= */
 
-        }, 50);
+    function extractAnswer(data) {
+
+        if (typeof data === "string") {
+            return data;
+        }
+
+        if (!data || typeof data !== "object") {
+            return "";
+        }
+
+        if (typeof data.answer === "string") {
+            return data.answer;
+        }
+
+        if (typeof data.response === "string") {
+            return data.response;
+        }
+
+        if (typeof data.result === "string") {
+            return data.result;
+        }
+
+        if (typeof data.message === "string") {
+            return data.message;
+        }
+
+        return "";
+
     }
 
 
-    /* ========================================================
-       SUBMIT QUESTION
-    ======================================================== */
+    /* =========================================================
+       ASK QUESTION
+    ========================================================= */
 
-    async function submitQuestion(question) {
+    async function askQuestion() {
 
-        question =
-            String(question || "").trim();
+        const question = input.value.trim();
 
         if (!question) {
             return;
         }
 
-
         /*
-         Remove welcome message after first question.
+         Prevent duplicate requests while one is running.
         */
-
-        if (welcome) {
-            welcome.remove();
-        }
-
+        askButton.disabled = true;
+        input.disabled = true;
 
         addUserMessage(question);
+
+        input.value = "";
 
         addLoadingMessage();
 
 
-        input.disabled = true;
-
-        button.disabled = true;
-
-
         try {
 
-            const response =
-                await fetch("/ask", {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        question: question,
-
-                        /*
-                         Small k = faster retrieval.
-                        */
-
-                        k: 3
-
-                    })
-
-                });
-
-
             /*
-             Always try to read JSON.
+             IMPORTANT:
+             Your FastAPI endpoint should be /ask.
+
+             Example backend:
+
+             @app.post("/ask")
+             async def ask(request: Question):
+                 ...
             */
 
-            let data = null;
+            const response = await fetch("/ask", {
 
-            try {
+                method: "POST",
 
-                data =
-                    await response.json();
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            } catch (jsonError) {
+                body: JSON.stringify({
+                    question: question
+                })
 
-                throw new Error(
-                    "Server returned an invalid response."
-                );
-
-            }
-
-
-            removeLoadingMessage();
+            });
 
 
             /*
-             HTTP error
+             If FastAPI returns an HTTP error,
+             show a useful error instead of silently failing.
             */
 
             if (!response.ok) {
 
-                const detail =
-                    data &&
-                    data.detail
-                        ? data.detail
-                        : "Unable to generate an answer.";
+                let errorText = "";
 
-                addError(detail);
+                try {
 
-                return;
+                    const errorData = await response.json();
+
+                    errorText =
+                        errorData.detail ||
+                        errorData.message ||
+                        "";
+
+                } catch (e) {
+
+                    errorText = "";
+
+                }
+
+                throw new Error(
+                    errorText ||
+                    `Server error (${response.status})`
+                );
+
             }
 
 
             /*
-             Make sure answer exists.
+             Read the response once.
             */
 
-            if (
-                !data ||
-                typeof data.answer !== "string" ||
-                !data.answer.trim()
-            ) {
+            const data = await response.json();
+
+
+            /*
+             Extract ONLY the answer.
+            */
+
+            const answer = extractAnswer(data);
+
+
+            if (!answer || !answer.trim()) {
 
                 addError(
-                    "No answer was returned."
+                    "The assistant returned an empty answer. Please try again."
                 );
 
                 return;
+
             }
 
 
             /*
-             IMPORTANT:
-             Only data.answer is displayed.
-
-             sources are completely ignored.
-
-             Therefore the UI will NOT show:
-             - Book page
-             - Book 1
-             - Book 2
-             - chunks
-             - retrieved context
-             - FAISS data
+             Show the COMPLETE answer.
             */
 
-            addAnswer(
-                data.answer.trim()
-            );
+            addAnswer(answer.trim());
 
 
         } catch (error) {
 
-            console.error(
-                "Request error:",
-                error
-            );
-
-            removeLoadingMessage();
+            console.error("Request error:", error);
 
             addError(
-                "Unable to connect to the RAG server."
+                "Unable to generate an answer. Please try again."
             );
 
         } finally {
 
+            askButton.disabled = false;
             input.disabled = false;
-
-            button.disabled = false;
-
-            input.value = "";
 
             input.focus();
 
@@ -1222,45 +993,39 @@
     }
 
 
-    /* ========================================================
-       FORM SUBMIT
-    ======================================================== */
+    /* =========================================================
+       ENTER KEY
+    ========================================================= */
 
-    form.addEventListener(
-        "submit",
-        function(event) {
+    input.addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter" && !event.shiftKey) {
 
             event.preventDefault();
 
-            submitQuestion(
-                input.value
-            );
+            askQuestion();
 
         }
-    );
+
+    });
 
 
-    /* ========================================================
-       ENTER KEY
-    ======================================================== */
+    /* =========================================================
+       SCROLL
+    ========================================================= */
 
-    input.addEventListener(
-        "keydown",
-        function(event) {
+    function scrollToBottom() {
 
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
+        setTimeout(() => {
 
-                event.preventDefault();
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: "smooth"
+            });
 
-                form.requestSubmit();
+        }, 50);
 
-            }
-
-        }
-    );
+    }
 
 </script>
 
