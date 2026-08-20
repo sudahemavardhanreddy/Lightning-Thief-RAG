@@ -95,7 +95,7 @@ def initialize_system():
     chunks = text_splitter.split_documents(docs)
 
     # Step 2: Embeddings & Vector Store
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
     vector_store = FAISS.from_documents(chunks, embeddings)
 
     # Step 3: Retrieval Tool Definition
