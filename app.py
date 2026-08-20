@@ -106,7 +106,7 @@ def initialize_system():
         return "\n\n".join(f"Content: {doc.page_content}" for doc in retrieved_docs)
 
     # Step 4: Agent Configuration
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.1)
+    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite", temperature=0.1)
     
     system_prompt = (
         "You are the head Oracle and Lorekeeper at Camp Half-Blood. "
